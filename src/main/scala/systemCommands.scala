@@ -7,12 +7,13 @@ import scala.sys.process.ProcessBuilder
 object SystemCommands {
   def runFullCommand( command:Seq[String], arguments:Seq[String] ):String = {
     val fullCommand = (command++arguments)
-    //println("Full Command: " + fullCommand )
     //Process(fullCommand).lineStream.last
-    fullCommand.run
-    //ProcessBuilder(command++arguments).lineStream
+    //ProcessBuilder(fullCommand).lineStream.toString
+    fullCommand!!
+
+    //fullCommand.run //Best version
     //val output = fullCommand.lineStream.foreach(println)
-    "returned"
+    //"returned"
   }
 }
 
