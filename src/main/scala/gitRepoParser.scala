@@ -60,12 +60,15 @@ object RepoParser {
 
   val git = Seq("git")
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
-  val loggerArguments = Seq("/home/bfrasure/Repositories/ClashOfClans/")
+  //val loggerArguments = Seq("/home/bfrasure/Repositories/ClashOfClans/")
+  val loggerArguments = Seq("/home/bfrasure/NetBeansProjects/smilereminder3/")
 
   def main(args: Array[String]) = 
   {
     val logOutput = SystemCommands.runFullCommand(jsonLogger, loggerArguments)
-    println(logOutput)
+    //println(logOutput)
+    val workEmail = ""
+    val personalEmail = ""
 
     val dummyOutput = repoInput
 
@@ -74,21 +77,25 @@ object RepoParser {
     // work with your data types as you normally would
     val niceEntries = entries.map(entry =>
         entry.copy(date = entry.date.orElse(Some("Date"))))
+
+    //val filteredEntries = niceEntries.filter(_.author == personalEmail )
+    val filteredEntries = niceEntries.filter(_.author == workEmail )
      
     // convert back to json, and then to a pretty printed string, alternative
     // ways to print may be nospaces, spaces2, or a custom format
      
-    val json = niceEntries.asJson
-    println(json.spaces4)
-    //val person =
-    //  Person("Bam Bam", 2, List("club"))
+    //val json = niceEntries.asJson
+    val json = filteredEntries.asJson
+    //println(json.spaces4)
+
 
     val prettyprinted: String =
-      json.spaces2
+      json.spaces4
 
     val parsed: Option[Person] =
       prettyprinted.decodeOption[Person]
 
-    println(parsed)
+    println(prettyprinted)
   }
 }
+
