@@ -60,11 +60,14 @@ object RepoParser {
 
   val git = Seq("git")
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
-  val loggerArguments = Seq()
+  val loggerArguments = Seq("/home/bfrasure/Repositories/ClashOfClans/")
 
   def main(args: Array[String]) = 
   {
     val logOutput = SystemCommands.runFullCommand(jsonLogger, loggerArguments)
+    println(logOutput)
+
+    val dummyOutput = repoInput
 
     val entries = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
      
@@ -75,20 +78,17 @@ object RepoParser {
     // convert back to json, and then to a pretty printed string, alternative
     // ways to print may be nospaces, spaces2, or a custom format
      
-    val resultEntries = niceEntries.asJson
-    println(resultEntries.spaces4)
+    val json = niceEntries.asJson
+    println(json.spaces4)
     //val person =
     //  Person("Bam Bam", 2, List("club"))
 
-    //val json: Json =
-    //  person.asJson
+    val prettyprinted: String =
+      json.spaces2
 
-    //println(json)
+    val parsed: Option[Person] =
+      prettyprinted.decodeOption[Person]
 
-    //val prettyprinted: String =
-    //  json.spaces2
-
-    //val parsed: Option[Person] =
-    //  prettyprinted.decodeOption[Person]
+    println(parsed)
   }
 }
