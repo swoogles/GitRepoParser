@@ -58,17 +58,27 @@ object RepoParser {
   //implicit def PersonCodecJson =
   //  casecodec3(Person.apply, Person.unapply)("name", "age", "things")
 
+  val home = "/home/bfrasure/"
   val git = Seq("git")
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
-  //val loggerArguments = Seq("/home/bfrasure/Repositories/ClashOfClans/")
-  val loggerArguments = Seq("/home/bfrasure/NetBeansProjects/smilereminder3/")
+
+  val gitRepo = "Repositories/ClashOfClans/"
+  //val gitRepo = "NetBeansProjects/smilereminder3/"
+
+
+  val gitDirectory= home + gitRepo
+  val loggerArguments = Seq(gitDirectory)
+  //val loggerArguments = Seq("/home/bfrasure/NetBeansProjects/smilereminder3/")
+  val gitDirectoryArguments = "--git-dir=" + gitDirectory + ".git --work-tree=" + gitDirectory
+
+   //git --git-dir=/home/bfrasure/Repositories/ClashOfClans/.git --work-tree=/home/bfrasure/Repositories/ClashOfClans/ show 411cae971973655
 
   def main(args: Array[String]) = 
   {
     val logOutput = SystemCommands.runFullCommand(jsonLogger, loggerArguments)
     //println(logOutput)
     val workEmail = ""
-    val personalEmail = ""
+    val personalEmail = "Bill Frasure <bill.frasure@gmail.com>"
 
     val dummyOutput = repoInput
 
@@ -78,8 +88,9 @@ object RepoParser {
     val niceEntries = entries.map(entry =>
         entry.copy(date = entry.date.orElse(Some("Date"))))
 
-    //val filteredEntries = niceEntries.filter(_.author == personalEmail )
-    val filteredEntries = niceEntries.filter(_.author == workEmail )
+    //val filteredEntries = niceEntries
+    val filteredEntries = niceEntries.filter(_.author == personalEmail )
+    //val filteredEntries = niceEntries.filter(_.author == workEmail )
      
     // convert back to json, and then to a pretty printed string, alternative
     // ways to print may be nospaces, spaces2, or a custom format
