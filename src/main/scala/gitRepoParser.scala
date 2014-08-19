@@ -33,6 +33,7 @@ object LogEntry {
 }
 
 class GitWorker(repoDir:String) {
+  val program = Seq("git")
   val gitDirectoryArguments = Seq("--git-dir="+ repoDir+ ".git", "--work-tree="+ repoDir)
   val gitShow = "show"
   val gitShowArguments = gitDirectoryArguments ++ Seq(gitShow, "411cae9719")
@@ -45,7 +46,10 @@ class GitWorker(repoDir:String) {
   //    "invalid move"
   //  }
 
+  def showFullCommit(hash:String):String = {
+    SystemCommands.runFullCommand(program, gitShowArguments )
   }
+}
 
    
 
@@ -99,6 +103,7 @@ object RepoParser {
     val entries = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
 
 
+
     //for ( entry <- entries ) {
     //  println("Author: ", entry.author)
     //}
@@ -128,8 +133,9 @@ object RepoParser {
     val parsed: Option[LogEntry] =
       prettyprinted.decodeOption[LogEntry]
 
-    //val showOutput = SystemCommands.runFullCommand(git, gitShowArguments )
     //println(showOutput)
+    val worker = new GitWorker(repoDir)
+    println(worker.showFullCommit("411cae971973"))
     
   }
 }
