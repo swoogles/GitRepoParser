@@ -89,20 +89,18 @@ object RepoParser {
     val logOutput = SystemCommands.runFullCommand(jsonLogger, loggerArguments)
     //println(logOutput)
     val workEmail = ""
-    val personalEmail = "Bill Frasure <bill.frasure@gmail.com>"
+    val personalEmail = args(0)
 
     val dummyOutput = repoInput
 
     val entries = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
-
-
 
     //for ( entry <- entries ) {
     //  println("Author: ", entry.author)
     //}
 
     val commits = entries.map(x=>x.commit)
-    commits.foreach(println)
+    //commits.foreach(println)
 
     // work with your data types as you normally would
     val niceEntries = entries.map(entry =>
@@ -117,7 +115,7 @@ object RepoParser {
      
     //val json = niceEntries.asJson
     val json = filteredEntries.asJson
-    //println(json.spaces4)
+    println(json.spaces4)
 
 
     val prettyprinted: String =
@@ -128,7 +126,7 @@ object RepoParser {
 
     //println(showOutput)
     val worker = new GitWorker(repoDir)
-    println(worker.showFullCommit("411cae971973"))
+    //println(worker.showFullCommit("411cae971973"))
     
   }
 }
