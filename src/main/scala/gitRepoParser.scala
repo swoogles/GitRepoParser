@@ -38,13 +38,6 @@ class GitWorker(repoDir:String) {
   val gitShow = "show"
   val gitShowArguments = gitDirectoryArguments ++ Seq(gitShow, "411cae9719")
 
-  //def set(e:Char):String = {
-  //  if(entry==' ' && (e=='X' || e=='O')) {
-  //    entry = e
-  //    "successful move"
-  //  } else
-  //    "invalid move"
-  //  }
 
   def showFullCommit(hash:String):String = {
     SystemCommands.runFullCommand(program, gitShowArguments )
