@@ -85,6 +85,11 @@ object RepoParser {
     val dummyOutput = repoInput
 
     val entries = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
+
+
+    for ( entry <- entries ) {
+      println("Author: ", entry.author)
+    }
      
     // work with your data types as you normally would
     val niceEntries = entries.map(entry =>
@@ -105,14 +110,17 @@ object RepoParser {
     val prettyprinted: String =
       json.spaces4
 
-    val parsed: Option[Person] =
-      prettyprinted.decodeOption[Person]
+    val parsed: Option[LogEntry] =
+      prettyprinted.decodeOption[LogEntry]
+
+    //val logEntries = input.decodeOption[List[Person]].getOrElse(Nil)
 
     println(prettyprinted)
 
     val showOutput = SystemCommands.runFullCommand(git, gitShowArguments )
 
-    println(showOutput)
+    //println(showOutput)
+    println("LogEntry: ", parsed)
     
   }
 }
