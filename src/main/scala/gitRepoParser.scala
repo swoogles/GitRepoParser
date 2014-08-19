@@ -32,6 +32,21 @@ object LogEntry {
     casecodec4(LogEntry.apply, LogEntry.unapply)("commit", "author", "date", "message")
 }
 
+class GitWorker(repoDir:String) {
+  val gitDirectoryArguments = Seq("--git-dir="+ repoDir+ ".git", "--work-tree="+ repoDir)
+  val gitShow = "show"
+  val gitShowArguments = gitDirectoryArguments ++ Seq(gitShow, "411cae9719")
+
+  //def set(e:Char):String = {
+  //  if(entry==' ' && (e=='X' || e=='O')) {
+  //    entry = e
+  //    "successful move"
+  //  } else
+  //    "invalid move"
+  //  }
+
+  }
+
    
 
 object RepoParser {
@@ -66,13 +81,10 @@ object RepoParser {
   //val gitRepo = "NetBeansProjects/smilereminder3/"
 
 
-  val gitDirectory= home + gitRepo
-  val loggerArguments = Seq(gitDirectory)
+  val repoDir= home + gitRepo
+  val loggerArguments = Seq(repoDir)
   //val loggerArguments = Seq("/home/bfrasure/NetBeansProjects/smilereminder3/")
-  val gitDirectoryArguments = Seq("--git-dir=", gitDirectory, ".git --work-tree=", gitDirectory)
-  val gitShow = "show"
-  val gitShowArguments = Seq("--git-dir="+ gitDirectory+ ".git", "--work-tree="+ gitDirectory, gitShow, "411cae9719")
-
+  
    //git --git-dir=/home/bfrasure/Repositories/ClashOfClans/.git --work-tree=/home/bfrasure/Repositories/ClashOfClans/ show 411cae971973655
 
   def main(args: Array[String]) = 
@@ -87,10 +99,13 @@ object RepoParser {
     val entries = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
 
 
-    for ( entry <- entries ) {
-      println("Author: ", entry.author)
-    }
-     
+    //for ( entry <- entries ) {
+    //  println("Author: ", entry.author)
+    //}
+
+    val commits = entries.map(x=>x.commit)
+    commits.foreach(println)
+
     // work with your data types as you normally would
     val niceEntries = entries.map(entry =>
         entry.copy(date = entry.date.orElse(Some("Date"))))
@@ -113,14 +128,8 @@ object RepoParser {
     val parsed: Option[LogEntry] =
       prettyprinted.decodeOption[LogEntry]
 
-    //val logEntries = input.decodeOption[List[Person]].getOrElse(Nil)
-
-    println(prettyprinted)
-
-    val showOutput = SystemCommands.runFullCommand(git, gitShowArguments )
-
+    //val showOutput = SystemCommands.runFullCommand(git, gitShowArguments )
     //println(showOutput)
-    println("LogEntry: ", parsed)
     
   }
 }
