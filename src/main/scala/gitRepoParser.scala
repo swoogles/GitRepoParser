@@ -69,7 +69,9 @@ object RepoParser {
   val gitDirectory= home + gitRepo
   val loggerArguments = Seq(gitDirectory)
   //val loggerArguments = Seq("/home/bfrasure/NetBeansProjects/smilereminder3/")
-  val gitDirectoryArguments = "--git-dir=" + gitDirectory + ".git --work-tree=" + gitDirectory
+  val gitDirectoryArguments = Seq("--git-dir=", gitDirectory, ".git --work-tree=", gitDirectory)
+  val gitShow = "show"
+  val gitShowArguments = Seq("--git-dir="+ gitDirectory+ ".git", "--work-tree="+ gitDirectory, gitShow, "411cae9719")
 
    //git --git-dir=/home/bfrasure/Repositories/ClashOfClans/.git --work-tree=/home/bfrasure/Repositories/ClashOfClans/ show 411cae971973655
 
@@ -107,6 +109,11 @@ object RepoParser {
       prettyprinted.decodeOption[Person]
 
     println(prettyprinted)
+
+    val showOutput = SystemCommands.runFullCommand(git, gitShowArguments )
+
+    println(showOutput)
+    
   }
 }
 
