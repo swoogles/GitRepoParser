@@ -7,9 +7,6 @@ import com.billding.SystemCommands
 
 import argonaut._, Argonaut._
  
-//case class Person(name: String, age: Int, things: List[String])
- 
-
 case class Address(street: String, number: Int, postcode: Int)
  
 object Address {
@@ -67,9 +64,6 @@ object RepoParser {
     // otherwise just take it as an empty list.
      
 
-  //implicit def PersonCodecJson =
-  //  casecodec3(Person.apply, Person.unapply)("name", "age", "things")
-
   val home = "/home/bfrasure/"
   val git = Seq("git")
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
@@ -80,24 +74,16 @@ object RepoParser {
 
   val repoDir= home + gitRepo
   val loggerArguments = Seq(repoDir)
-  //val loggerArguments = Seq("/home/bfrasure/NetBeansProjects/smilereminder3/")
-  
-   //git --git-dir=/home/bfrasure/Repositories/ClashOfClans/.git --work-tree=/home/bfrasure/Repositories/ClashOfClans/ show 411cae971973655
 
   def main(args: Array[String]) = 
   {
     val logOutput = SystemCommands.runFullCommand(jsonLogger, loggerArguments)
-    //println(logOutput)
-    val workEmail = ""
-    val personalEmail = args(0)
+    val email = args(0)
 
     val dummyOutput = repoInput
 
     val entries = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
 
-    //for ( entry <- entries ) {
-    //  println("Author: ", entry.author)
-    //}
 
     val commits = entries.map(x=>x.commit)
     //commits.foreach(println)
@@ -106,14 +92,11 @@ object RepoParser {
     val niceEntries = entries.map(entry =>
         entry.copy(date = entry.date.orElse(Some("Date"))))
 
-    //val filteredEntries = niceEntries
-    val filteredEntries = niceEntries.filter(_.author == personalEmail )
-    //val filteredEntries = niceEntries.filter(_.author == workEmail )
+    val filteredEntries = niceEntries.filter(_.author == email )
      
     // convert back to json, and then to a pretty printed string, alternative
     // ways to print may be nospaces, spaces2, or a custom format
      
-    //val json = niceEntries.asJson
     val json = filteredEntries.asJson
     println(json.spaces4)
 
@@ -124,10 +107,8 @@ object RepoParser {
     val parsed: Option[LogEntry] =
       prettyprinted.decodeOption[LogEntry]
 
-    //println(showOutput)
     val worker = new GitWorker(repoDir)
     //println(worker.showFullCommit("411cae971973"))
-    
   }
 }
 
