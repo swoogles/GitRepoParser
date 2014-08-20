@@ -30,14 +30,15 @@ object LogEntry {
 }
 
 class GitWorker(repoDir:String) {
-  val program = Seq("git")
+  implicit val program = Seq("git")
   val gitDirectoryArguments = Seq("--git-dir="+ repoDir+ ".git", "--work-tree="+ repoDir)
   val gitShow = "show"
   val gitShowArguments = gitDirectoryArguments ++ Seq(gitShow, "411cae9719")
 
 
   def showFullCommit(hash:String):String = {
-    SystemCommands.runFullCommand(program, gitShowArguments )
+    implicit val program = Seq[String]("git")
+    SystemCommands.runFullCommand(gitShowArguments )
   }
 }
 
@@ -77,7 +78,7 @@ object RepoParser {
 
   def main(args: Array[String]) = 
   {
-    val logOutput = SystemCommands.runFullCommand(jsonLogger, loggerArguments)
+    val logOutput = SystemCommands.runFullCommand(loggerArguments)(jsonLogger)
     val email = args(0)
 
     val dummyOutput = repoInput
@@ -98,7 +99,7 @@ object RepoParser {
     // ways to print may be nospaces, spaces2, or a custom format
      
     val json = filteredEntries.asJson
-    println(json.spaces4)
+    //println(json.spaces4)
 
 
     val prettyprinted: String =
@@ -108,7 +109,7 @@ object RepoParser {
       prettyprinted.decodeOption[LogEntry]
 
     val worker = new GitWorker(repoDir)
-    //println(worker.showFullCommit("411cae971973"))
+    println(worker.showFullCommit("411cae971973"))
   }
 }
 

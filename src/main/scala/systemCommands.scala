@@ -5,8 +5,8 @@ import scala.sys.process.Process
 import scala.sys.process.ProcessBuilder
 
 object SystemCommands {
-  def runFullCommand( command:Seq[String], arguments:Seq[String] ):String = {
-    val fullCommand = (command++arguments)
+  def runFullCommand (arguments:Seq[String] )( implicit program:Seq[String]):String = {
+    val fullCommand = (program++arguments)
     //Process(fullCommand).lineStream.last
     //ProcessBuilder(fullCommand).lineStream.toString
     fullCommand!!
