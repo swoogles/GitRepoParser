@@ -32,13 +32,10 @@ object LogEntry {
 class GitWorker(repoDir:String) {
   implicit val program = Seq("git")
   val gitDirectoryArguments = Seq("--git-dir="+ repoDir+ ".git", "--work-tree="+ repoDir)
-  val gitShow = "show"
-  val gitShowArguments = gitDirectoryArguments ++ Seq(gitShow, "411cae9719")
-
 
   def showFullCommit(hash:String):String = {
-    implicit val program = Seq[String]("git")
-    SystemCommands.runFullCommand(gitShowArguments )
+    val action = "show"
+    SystemCommands.runFullCommand(gitDirectoryArguments++Seq(action, hash))
   }
 }
 
