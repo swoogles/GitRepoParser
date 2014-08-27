@@ -6,21 +6,6 @@ import scala.sys.process.Process
 import com.billding.SystemCommands
 
 import argonaut._, Argonaut._
- 
-case class Address(street: String, number: Int, postcode: Int)
- 
-object Address {
-  // Define codecs easily from case classes
-  implicit def AddressCodecJson: CodecJson[Address] =
-    casecodec3(Address.apply, Address.unapply)("street", "number", "post_code")
-}
- 
-case class Person(name: String, age: Int, address: Option[Address], greeting: Option[String])
- 
-object Person {
-  implicit def PersonCodecJson: CodecJson[Person] =
-    casecodec4(Person.apply, Person.unapply)("name", "age", "address", "greeting")
-}
 
 case class LogEntry(commit: String, author: String, date: Option[String], message: Option[String])
  
@@ -39,8 +24,6 @@ class GitWorker(repoDir:String) {
   }
 }
 
-   
-
 object RepoParser {
 
    val repoInput = """
@@ -50,17 +33,11 @@ object RepoParser {
         "date": "Fri Aug 15 14:03:11 2014 -0600",
          "message": "Bring-Argonaut-into-project"
    },
-   {
-      "commit": "5190e305780844743134943be768076e0721e890",
-       "author": "Bill Frasure <bill.frasure@gmail.com>",
-        "date": "Fri Aug 15 13:57:26 2014 -0600",
-         "message": "Add-some-filetypes-ignores-for-Scala"
-   }]
+   {...}]
    """
      
-    // parse the string as json, attempt to decode it to a list of person,
+    // parse the string as json, attempt to decode it to a list of commits,
     // otherwise just take it as an empty list.
-     
 
   val home = "/home/bfrasure/"
   val git = Seq("git")
@@ -81,7 +58,6 @@ object RepoParser {
     val dummyOutput = repoInput
 
     val entries = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
-
 
     val commits = entries.map(x=>x.commit)
     //commits.foreach(println)
