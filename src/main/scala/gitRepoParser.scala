@@ -20,7 +20,8 @@ class GitWorker(repoDir:String) {
 
   def showFullCommit(hash:String):String = {
     val action = "show"
-    SystemCommands.runFullCommand(gitDirectoryArguments++Seq(action, hash))
+    val numStat = Seq("--numstat")
+    SystemCommands.runFullCommand(gitDirectoryArguments++Seq(action, hash)++numStat)
   }
 }
 
@@ -72,7 +73,7 @@ object RepoParser {
     // ways to print may be nospaces, spaces2, or a custom format
      
     val json = filteredEntries.asJson
-    println(json.spaces4)
+    //println(json.spaces4)
 
 
     val prettyprinted: String =
@@ -82,7 +83,7 @@ object RepoParser {
       prettyprinted.decodeOption[LogEntry]
 
     val worker = new GitWorker(repoDir)
-    //println(worker.showFullCommit("411cae971973"))
+    println(worker.showFullCommit("411cae971973"))
 
     //import breeze.linalg._
     //import breeze.plot._
