@@ -72,7 +72,7 @@ object RepoParser {
     // ways to print may be nospaces, spaces2, or a custom format
      
     val json = filteredEntries.asJson
-    //println(json.spaces4)
+    println(json.spaces4)
 
 
     val prettyprinted: String =
@@ -82,7 +82,25 @@ object RepoParser {
       prettyprinted.decodeOption[LogEntry]
 
     val worker = new GitWorker(repoDir)
-    println(worker.showFullCommit("411cae971973"))
+    //println(worker.showFullCommit("411cae971973"))
+
+    //import breeze.linalg._
+    //import breeze.plot._
+
+    //val f = Figure()
+    //val p = f.subplot(0)
+    //val x = linspace(0.0,1.0)
+    //p += plot(x, x :^ 2.0)
+    //p += plot(x, x :^ 3.0, '.')
+    //p.xlabel = "x axis"
+    //p.ylabel = "y axis"
+    //f.saveas("lines.png")
+
+    //val p2 = f.subplot(2,1,1)
+    //val g = breeze.stats.distributions.Gaussian(0,1)
+    //p2 += hist(g.sample(100000),100)
+    //p2.title = "A normal distribution"
+    //f.saveas("subplots.png")
   }
 }
 

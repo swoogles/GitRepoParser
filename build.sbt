@@ -2,10 +2,15 @@ name := "hello"
 
 version := "1.0"
 
-scalaVersion := "2.10.2"
+scalaVersion := "2.11.1"
 
 libraryDependencies ++= Seq(
-  "io.argonaut" %% "argonaut" % "6.0.4"     
-)
+  "io.argonaut" %% "argonaut" % "6.0.4",
+  "org.scalanlp" % "breeze_2.10" % "0.9",
+  // native libraries are not included by default. add this if you want them (as of 0.7)
+  // native libraries greatly improve performance, but increase jar sizes.
+  "org.scalanlp" % "breeze-natives_2.10" % "0.9",
+  "org.scalanlp" % "breeze-viz_2.10" % "0.5.1"
+  )
 
 mainClass := Some("RepoParser")
