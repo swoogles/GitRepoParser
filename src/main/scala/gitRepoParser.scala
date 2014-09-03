@@ -1,6 +1,8 @@
 import scala.sys.process._
 import scala.sys.process.Process
 
+import util.matching.Regex
+
 import scala.sys.process._
 import scala.sys.process.Process
 import com.billding.SystemCommands
@@ -15,16 +17,38 @@ object LogEntry {
 }
 
 class GitWorker(repoDir:String) {
+
   implicit val program = Seq("git")
   val gitDirectoryArguments = Seq("--git-dir="+ repoDir+ ".git", "--work-tree="+ repoDir)
+
+  def getNumbers(commitInfo:String) {
+    val multiDigitPat:Regex = "\\d+".r
+    val filesChangedPat = "\\d+ files changed".r
+    val insertionsPat = "\\d+ insertions".r
+    val deletionsPat = "\\d+ deletions".r
+
+    val filesChangedString = filesChangedPat findAllIn commitInfo next 
+    val filesChangedNum = filesChangedString(0)
+    val linesAddedString = insertionsPat findAllIn commitInfo next
+    val linesAddedNum = linesAddedString(0)
+
+    println("filesChangedNum: " + filesChangedNum)
+    println("linesAddedNum: " + linesAddedNum)
+    
+    //val numbersIterator:scala.util.matching.Regex.MatchIterator  = multiDigitPat findAllIn repoDir
+
+  }
 
   def showFullCommit(hash:String):String = {
     val action = "show"
     val numStat = Seq("--numstat")
-    SystemCommands.runFullCommand(gitDirectoryArguments++Seq(action, hash)++numStat)
+    val shortStat = Seq("--shortstat")
+    val oneLine = Seq("--oneline")
+    SystemCommands.runFullCommand(gitDirectoryArguments++Seq(action, hash)++oneLine++shortStat)
   }
 }
 
+class RepoParser 
 object RepoParser {
 
    val repoInput = """
@@ -83,7 +107,14 @@ object RepoParser {
       prettyprinted.decodeOption[LogEntry]
 
     val worker = new GitWorker(repoDir)
-    println(worker.showFullCommit("411cae971973"))
+    val testString = "2 files changed, 40 insertions(+), 37 deletions(-)"
+    worker getNumbers testString
+    //println(worker.showFullCommit("411cae971973"))
+
+    //for ( commit <- commits ) {
+    //  println(worker.showFullCommit(commit))
+    //}
+
 
     //import breeze.linalg._
     //import breeze.plot._
