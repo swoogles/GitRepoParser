@@ -21,23 +21,41 @@ class GitWorker(repoDir:String) {
   implicit val program = Seq("git")
   val gitDirectoryArguments = Seq("--git-dir="+ repoDir+ ".git", "--work-tree="+ repoDir)
 
-  def getNumbers(commitInfo:String) {
-    val multiDigitPat:Regex = "\\d+".r
-    val filesChangedPat = "\\d+ files changed".r
-    val insertionsPat = "\\d+ insertions".r
-    val deletionsPat = "\\d+ deletions".r
-
-    val filesChangedString = filesChangedPat findAllIn commitInfo next 
-    val filesChangedNum = filesChangedString(0)
-    val linesAddedString = insertionsPat findAllIn commitInfo next
-    val linesAddedNum = linesAddedString(0)
-
-    println("filesChangedNum: " + filesChangedNum)
-    println("linesAddedNum: " + linesAddedNum)
-    
-    //val numbersIterator:scala.util.matching.Regex.MatchIterator  = multiDigitPat findAllIn repoDir
-
+  def getFirstNum(wordsString:String):Int = {
+    val words = wordsString split("\\s+")
+    words(0).toInt
   }
+
+  def getLinesAdded(commitInfo:String):Int = {
+    val insertionsPat = "\\d+ insertions".r
+
+    val linesAddedString = insertionsPat findAllIn commitInfo next
+    val linesAddedNum = getFirstNum(linesAddedString) 
+    linesAddedNum 
+  }
+
+  def hasLinesAdded(commitInfo:String):Boolean = {
+    val insertionsPat = "\\d+ insertions".r
+    insertionsPat findAllIn commitInfo nonEmpty
+  }
+
+  //def getNumbers(commitInfo:String) {
+  //  val multiDigitPat:Regex = "\\d+".r
+  //  val filesChangedPat = "\\d+ files changed".r
+  //  val insertionsPat = "\\d+ insertions".r
+  //  val deletionsPat = "\\d+ deletions".r
+
+  //  val filesChangedString = filesChangedPat findAllIn commitInfo next 
+  //  val filesChangedNum = filesChangedString split("\\s+")(0)
+  //  val linesAddedString = insertionsPat findAllIn commitInfo next
+  //  val linesAddedNum = linesAddedString(0)
+
+  //  println("linesAddedString: " + linesAddedString)
+  //  println("linesAddedNum: " + linesAddedNum)
+  //  
+  //  //val numbersIterator:scala.util.matching.Regex.MatchIterator  = multiDigitPat findAllIn repoDir
+
+  //}
 
   def showFullCommit(hash:String):String = {
     val action = "show"
@@ -85,7 +103,6 @@ object RepoParser {
     val entries = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
 
     val commits = entries.map(x=>x.commit)
-    //commits.foreach(println)
 
     // work with your data types as you normally would
     val niceEntries = entries.map(entry =>
@@ -107,32 +124,33 @@ object RepoParser {
       prettyprinted.decodeOption[LogEntry]
 
     val worker = new GitWorker(repoDir)
-    val testString = "2 files changed, 40 insertions(+), 37 deletions(-)"
-    worker getNumbers testString
-    //println(worker.showFullCommit("411cae971973"))
-
-    //for ( commit <- commits ) {
-    //  println(worker.showFullCommit(commit))
+    //worker.showFullCommit("016255b40f")
+    println("Bloop: " + worker.getLinesAdded( worker.showFullCommit("411cae971973")) )
+    //for ( line <- worker.showFullCommit("411cae971973") ) {
+    //  println("Line: " + line)
     //}
+    val testString = "2 files changed, 40 insertions(+), 37 deletions(-)"
+    //worker getNumbers testString
+    val numLinesAdded = worker getLinesAdded testString
+    println("numLinesAdded: " + numLinesAdded )
 
+    //commits.view.zipWithIndex foreach {case (value,index) => println(value,index)}
 
-    //import breeze.linalg._
-    //import breeze.plot._
+    //commits.view.zipWithIndex foreach {case (value,index) => 
+    //  case worker.hasLinesAdded( worker.showFullCommit(commit)) =>
+    //    println(commit + ": " + worker.getLinesAdded( worker.showFullCommit(commit)) )
+    //println(value,index)}
 
-    //val f = Figure()
-    //val p = f.subplot(0)
-    //val x = linspace(0.0,1.0)
-    //p += plot(x, x :^ 2.0)
-    //p += plot(x, x :^ 3.0, '.')
-    //p.xlabel = "x axis"
-    //p.ylabel = "y axis"
-    //f.saveas("lines.png")
+    for ( (commit,index) <- commits.view.zipWithIndex ) {
+      if( worker.hasLinesAdded( worker.showFullCommit(commit)) ) {
+        println( index + " " + worker.getLinesAdded( worker.showFullCommit(commit)) )
+      }
+      else {
+        println( index + " " + 0 )
+      }
+    }
+    println("Le Fin.")
 
-    //val p2 = f.subplot(2,1,1)
-    //val g = breeze.stats.distributions.Gaussian(0,1)
-    //p2 += hist(g.sample(100000),100)
-    //p2.title = "A normal distribution"
-    //f.saveas("subplots.png")
   }
 }
 
