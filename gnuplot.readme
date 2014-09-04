@@ -1,0 +1,15 @@
+Output: 
+  To export Gnuplot output to png format:
+    set terminal png size 400,300 enhanced font "Helvetica,20"
+    set output 'output.png'
+
+  To save Gnuplot output as jpg format:
+    set terminal jpg color enhanced "Helvetica" 20
+    set output "output.jpg"
+
+  To convert Gnuplot output to gif format: 
+    set terminal gif color enhanced
+    set output "output.gif"
+
+  From http://xmodulo.com/2013/01/how-to-export-gnuplot-output-to-png-jpg-and-pdf.html)
+
