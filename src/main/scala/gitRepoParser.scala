@@ -86,8 +86,8 @@ object RepoParser {
   val git = Seq("git")
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
 
-  //val gitRepo = "Repositories/ClashOfClans/"
-  val gitRepo = "NetBeansProjects/smilereminder3/"
+  val gitRepo = "Repositories/ClashOfClans/"
+  //val gitRepo = "NetBeansProjects/smilereminder3/"
 
 
   val repoDir= home + gitRepo
@@ -111,12 +111,8 @@ object RepoParser {
     val filteredEntries = niceEntries.filter(_.author == email )
     val filteredCommits = filteredEntries.map(x=>x.commit)
      
-    // convert back to json, and then to a pretty printed string, alternative
-    // ways to print may be nospaces, spaces2, or a custom format
-     
     val json = filteredEntries.asJson
     //println(json.spaces4)
-
 
     val prettyprinted: String =
       json.spaces4
@@ -125,11 +121,6 @@ object RepoParser {
       prettyprinted.decodeOption[LogEntry]
 
     val worker = new GitWorker(repoDir)
-    //worker.showFullCommit("016255b40f")
-    //println("Bloop: " + worker.getLinesAdded( worker.showFullCommit("411cae971973")) )
-    //for ( line <- worker.showFullCommit("411cae971973") ) {
-    //  println("Line: " + line)
-    //}
     val testString = "2 files changed, 40 insertions(+), 37 deletions(-)"
     //worker getNumbers testString
     val numLinesAdded = worker getLinesAdded testString
@@ -144,8 +135,8 @@ object RepoParser {
 
     for ( (commit,index) <- filteredCommits.view.zipWithIndex ) {
       if( worker.hasLinesAdded( worker.showFullCommit(commit)) ) {
-        println( index + " " + worker.getLinesAdded( worker.showFullCommit(commit)) )
-        //println(commit + ": " + index + " " + worker.getLinesAdded( worker.showFullCommit(commit)) )
+        //println( index + " " + worker.getLinesAdded( worker.showFullCommit(commit)) )
+        println(commit + ": " + index + " " + worker.getLinesAdded( worker.showFullCommit(commit)) )
       }
       else {
         println( index + " " + 0 )
