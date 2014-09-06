@@ -26,6 +26,16 @@ class GitWorker(repoDir:String) {
     words(0).toInt
   }
 
+  def getFilesChanged(commitInfo:String):Int = {
+    val filesChangedPat = "\\d+ files? changed".r
+
+    val filesChangedStrings = filesChangedPat findAllIn commitInfo
+    if (filesChangedStrings nonEmpty)
+      getFirstNum(filesChangedStrings next) 
+    else
+      0
+  }
+
   def getLinesAdded(commitInfo:String):Int = {
     val insertionsPat = "\\d+ insertions".r
 
@@ -47,7 +57,6 @@ class GitWorker(repoDir:String) {
   }
 
   //  val multiDigitPat:Regex = "\\d+".r
-  //  val filesChangedPat = "\\d+ files changed".r
 
   //  val filesChangedString = filesChangedPat findAllIn commitInfo next 
 
@@ -118,7 +127,10 @@ object RepoParser {
     //commits.view.zipWithIndex foreach {case (value,index) => println(value,index)}
 
     for ( (commit,index) <- filteredCommits.view.zipWithIndex ) {
-        println(commit + ": " + index + " " + worker.getLinesAdded( worker.showFullCommit(commit)) + " " + worker.getLinesDeleted( worker.showFullCommit(commit)))
+        println(commit + ": " + index + " " 
+          + worker.getFilesChanged( worker.showFullCommit(commit)) + " " 
+          + worker.getLinesAdded( worker.showFullCommit(commit)) + " " 
+          + worker.getLinesDeleted( worker.showFullCommit(commit)))
     }
     println("Le Fin.")
 
