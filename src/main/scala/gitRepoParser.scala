@@ -30,41 +30,26 @@ class GitWorker(repoDir:String) {
     val insertionsPat = "\\d+ insertions".r
 
     val linesAddedStrings = insertionsPat findAllIn commitInfo
-    if (linesAddedStrings nonEmpty) {
+    if (linesAddedStrings nonEmpty)
       getFirstNum(linesAddedStrings next) 
-    } else {
+    else
       0
-    }
   }
 
   def getLinesDeleted(commitInfo:String):Int = {
     val deletionsPat = "\\d+ deletions".r
 
     val linesDeletedStrings = deletionsPat  findAllIn commitInfo
-    if (linesDeletedStrings nonEmpty) {
+    if (linesDeletedStrings nonEmpty)
       getFirstNum(linesDeletedStrings next) 
-    } else {
+    else
       0
-    }
   }
 
-  //def getNumbers(commitInfo:String) {
   //  val multiDigitPat:Regex = "\\d+".r
   //  val filesChangedPat = "\\d+ files changed".r
-  //  val insertionsPat = "\\d+ insertions".r
-  //  val deletionsPat = "\\d+ deletions".r
 
   //  val filesChangedString = filesChangedPat findAllIn commitInfo next 
-  //  val filesChangedNum = filesChangedString split("\\s+")(0)
-  //  val linesAddedString = insertionsPat findAllIn commitInfo next
-  //  val linesAddedNum = linesAddedString(0)
-
-  //  println("linesAddedString: " + linesAddedString)
-  //  println("linesAddedNum: " + linesAddedNum)
-  //  
-  //  //val numbersIterator:scala.util.matching.Regex.MatchIterator  = multiDigitPat findAllIn repoDir
-
-  //}
 
   def showFullCommit(hash:String):String = {
     val action = "show"
@@ -88,9 +73,6 @@ object RepoParser {
    {...}]
    """
      
-    // parse the string as json, attempt to decode it to a list of commits,
-    // otherwise just take it as an empty list.
-
   val home = "/home/bfrasure/"
   val git = Seq("git")
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
@@ -121,7 +103,6 @@ object RepoParser {
     val filteredCommits = filteredEntries.map(x=>x.commit)
      
     val json = filteredEntries.asJson
-    //println(json.spaces4)
 
     val prettyprinted: String =
       json.spaces4
@@ -131,16 +112,10 @@ object RepoParser {
 
     val worker = new GitWorker(repoDir)
     val testString = "2 files changed, 40 insertions(+), 37 deletions(-)"
-    //worker getNumbers testString
     val numLinesAdded = worker getLinesAdded testString
     println("numLinesAdded: " + numLinesAdded )
 
     //commits.view.zipWithIndex foreach {case (value,index) => println(value,index)}
-
-    //commits.view.zipWithIndex foreach {case (value,index) => 
-    //  case worker.hasLinesAdded( worker.showFullCommit(commit)) =>
-    //    println(commit + ": " + worker.getLinesAdded( worker.showFullCommit(commit)) )
-    //println(value,index)}
 
     for ( (commit,index) <- filteredCommits.view.zipWithIndex ) {
         println(commit + ": " + index + " " + worker.getLinesAdded( worker.showFullCommit(commit)) + " " + worker.getLinesDeleted( worker.showFullCommit(commit)))
