@@ -35,18 +35,15 @@ class GitWorker(repoDir:String) {
   }
 
   def getFilesChanged(commitInfo:String):Int = {
-    val filesChangedPat = "\\d+ files? changed".r
-    getNumberWithPattern(commitInfo, filesChangedPat)
+    getNumberWithPattern(commitInfo, "\\d+ files? changed".r)
   }
 
   def getLinesAdded(commitInfo:String):Int = {
-    val insertionsPat = "\\d+ insertions".r
-    getNumberWithPattern(commitInfo, insertionsPat)
+    getNumberWithPattern(commitInfo, "\\d+ insertions".r)
   }
 
   def getLinesDeleted(commitInfo:String):Int = {
-    val deletionsPat = "\\d+ deletions".r
-    getNumberWithPattern(commitInfo, deletionsPat)
+    getNumberWithPattern(commitInfo, "\\d+ deletions".r)
   }
 
 
