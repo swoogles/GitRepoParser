@@ -46,11 +46,6 @@ class GitWorker(repoDir:String) {
     getNumberWithPattern(commitInfo, "\\d+ deletions".r)
   }
 
-
-  //  val multiDigitPat:Regex = "\\d+".r
-
-  //  val filesChangedString = filesChangedPat findAllIn commitInfo next 
-
   def showFullCommit(hash:String):String = {
     val action = "show"
     val numStat = Seq("--numstat")
@@ -80,7 +75,6 @@ object RepoParser {
   val gitRepo = "Repositories/ClashOfClans/"
   //val gitRepo = "NetBeansProjects/smilereminder3/"
 
-
   val repoDir= home + gitRepo
   val loggerArguments = Seq(repoDir)
 
@@ -95,7 +89,6 @@ object RepoParser {
 
     val commits = entries.map(x=>x.commit)
 
-    // work with your data types as you normally would
     val niceEntries = entries.map(entry =>
         entry.copy(date = entry.date.orElse(Some("Date"))))
 
@@ -111,9 +104,6 @@ object RepoParser {
       prettyprinted.decodeOption[LogEntry]
 
     val worker = new GitWorker(repoDir)
-    val testString = "2 files changed, 40 insertions(+), 37 deletions(-)"
-    val numLinesAdded = worker getLinesAdded testString
-    println("numLinesAdded: " + numLinesAdded )
 
     //commits.view.zipWithIndex foreach {case (value,index) => println(value,index)}
 
@@ -123,8 +113,6 @@ object RepoParser {
           + worker.getLinesAdded( worker.showFullCommit(commit)) + " " 
           + worker.getLinesDeleted( worker.showFullCommit(commit)))
     }
-    println("Le Fin.")
-
   }
 }
 
