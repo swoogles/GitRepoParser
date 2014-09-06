@@ -26,35 +26,29 @@ class GitWorker(repoDir:String) {
     words(0).toInt
   }
 
-  def getFilesChanged(commitInfo:String):Int = {
-    val filesChangedPat = "\\d+ files? changed".r
-
-    val filesChangedStrings = filesChangedPat findAllIn commitInfo
-    if (filesChangedStrings nonEmpty)
-      getFirstNum(filesChangedStrings next) 
+  def getNumberWithPattern(commitInfo:String, pattern: Regex ):Int = {
+    val matchingStrings = pattern findAllIn commitInfo
+    if (matchingStrings nonEmpty)
+      getFirstNum(matchingStrings next) 
     else
       0
+  }
+
+  def getFilesChanged(commitInfo:String):Int = {
+    val filesChangedPat = "\\d+ files? changed".r
+    getNumberWithPattern(commitInfo, filesChangedPat)
   }
 
   def getLinesAdded(commitInfo:String):Int = {
     val insertionsPat = "\\d+ insertions".r
-
-    val linesAddedStrings = insertionsPat findAllIn commitInfo
-    if (linesAddedStrings nonEmpty)
-      getFirstNum(linesAddedStrings next) 
-    else
-      0
+    getNumberWithPattern(commitInfo, insertionsPat)
   }
 
   def getLinesDeleted(commitInfo:String):Int = {
     val deletionsPat = "\\d+ deletions".r
-
-    val linesDeletedStrings = deletionsPat  findAllIn commitInfo
-    if (linesDeletedStrings nonEmpty)
-      getFirstNum(linesDeletedStrings next) 
-    else
-      0
+    getNumberWithPattern(commitInfo, deletionsPat)
   }
+
 
   //  val multiDigitPat:Regex = "\\d+".r
 
