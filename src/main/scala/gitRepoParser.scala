@@ -37,6 +37,17 @@ class GitWorker(repoDir:String) {
     }
   }
 
+  def getLinesDeleted(commitInfo:String):Int = {
+    val deletionsPat = "\\d+ deletions".r
+
+    val linesDeletedStrings = deletionsPat  findAllIn commitInfo
+    if (linesDeletedStrings nonEmpty) {
+      getFirstNum(linesDeletedStrings next) 
+    } else {
+      0
+    }
+  }
+
   //def getNumbers(commitInfo:String) {
   //  val multiDigitPat:Regex = "\\d+".r
   //  val filesChangedPat = "\\d+ files changed".r
@@ -132,7 +143,7 @@ object RepoParser {
     //println(value,index)}
 
     for ( (commit,index) <- filteredCommits.view.zipWithIndex ) {
-        println(commit + ": " + index + " " + worker.getLinesAdded( worker.showFullCommit(commit)) )
+        println(commit + ": " + index + " " + worker.getLinesAdded( worker.showFullCommit(commit)) + " " + worker.getLinesDeleted( worker.showFullCommit(commit)))
     }
     println("Le Fin.")
 
