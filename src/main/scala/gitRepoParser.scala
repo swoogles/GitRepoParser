@@ -111,7 +111,7 @@ object RepoParser {
         println(commit + ": " + index + " " 
           + worker.getFilesChanged( worker.showFullCommit(commit)) + " " 
           + worker.getLinesAdded( worker.showFullCommit(commit)) + " " 
-          + worker.getLinesDeleted( worker.showFullCommit(commit)))
+          + (-worker.getLinesDeleted( worker.showFullCommit(commit))) )
     }
   }
 }
