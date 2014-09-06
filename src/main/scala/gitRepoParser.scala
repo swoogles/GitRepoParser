@@ -29,14 +29,12 @@ class GitWorker(repoDir:String) {
   def getLinesAdded(commitInfo:String):Int = {
     val insertionsPat = "\\d+ insertions".r
 
-    val linesAddedString = insertionsPat findAllIn commitInfo next
-    val linesAddedNum = getFirstNum(linesAddedString) 
-    linesAddedNum 
-  }
-
-  def hasLinesAdded(commitInfo:String):Boolean = {
-    val insertionsPat = "\\d+ insertions".r
-    insertionsPat findAllIn commitInfo nonEmpty
+    val linesAddedStrings = insertionsPat findAllIn commitInfo
+    if (linesAddedStrings nonEmpty) {
+      getFirstNum(linesAddedStrings next) 
+    } else {
+      0
+    }
   }
 
   //def getNumbers(commitInfo:String) {
@@ -134,13 +132,7 @@ object RepoParser {
     //println(value,index)}
 
     for ( (commit,index) <- filteredCommits.view.zipWithIndex ) {
-      if( worker.hasLinesAdded( worker.showFullCommit(commit)) ) {
-        //println( index + " " + worker.getLinesAdded( worker.showFullCommit(commit)) )
         println(commit + ": " + index + " " + worker.getLinesAdded( worker.showFullCommit(commit)) )
-      }
-      else {
-        println( index + " " + 0 )
-      }
     }
     println("Le Fin.")
 
