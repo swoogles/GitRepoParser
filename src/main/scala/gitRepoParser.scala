@@ -10,6 +10,13 @@ import com.billding.SystemCommands
 import argonaut._, Argonaut._
 
 case class LogEntry(commit: String, author: String, date: Option[String], message: Option[String])
+
+class Utility() {
+  def printToFile(f: java.io.File)(op: java.io.PrintWriter => Unit) {
+      val p = new java.io.PrintWriter(f)
+        try { op(p) } finally { p.close() }
+  }
+}
  
 object LogEntry {
   implicit def LogEntryCodecJson: CodecJson[LogEntry] =
@@ -17,8 +24,13 @@ object LogEntry {
 }
 
 class DataWriter() {
-  def write(data:List[String], outputFile:String):String = {
-    SystemCommands.runFullCommand(Seq(outputFile))
+  def write(data:List[String], outputFile:String, utility:Utility):String = {
+    // Write to file
+    import java.io._
+    utility.printToFile(new File(outputFile))(p => {
+        data.foreach(p.println)
+    })
+    "incomplete"
   }
 }
 
@@ -128,6 +140,12 @@ object RepoParser {
           worker.showFullCommit(commit)
         //)
     }
+
+    val data = List("Five","strings","in","a","file!")
+    val dataWriter:DataWriter = new DataWriter
+    val utility:Utility = new Utility
+    dataWriter.write(data, "blah.dat", utility)
+    println("Done")
 
     //for ( (commit,index) <- filteredCommits.view.zipWithIndex ) {
     //    println(
