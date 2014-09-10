@@ -135,11 +135,10 @@ object RepoParser {
     //println(prettyprinted)
     //commits.view.zipWithIndex foreach {case (value,index) => println(value,index)}
 
-    for ( (commit,index) <- filteredCommits.view.zipWithIndex ) {
-        //println(
-          worker.showFullCommit(commit)
-        //)
-    }
+    val newCommits = for ( (commit,index) <- filteredCommits.view.zipWithIndex ) yield commit
+          //worker.showFullCommit(commit)
+    newCommits foreach println
+        
 
     val data = List("Five","strings","in","a","file!")
     val dataWriter:DataWriter = new DataWriter
