@@ -16,10 +16,24 @@ object LogEntry {
     casecodec4(LogEntry.apply, LogEntry.unapply)("commit", "author", "date", "message")
 }
 
+class DataWriter() {
+  def write(data:List[String], outputFile:String):String = {
+    SystemCommands.runFullCommand(Seq(outputFile))
+  }
+}
+
+class GnuPlotter() {
+  implicit val program = Seq("gnuplot")
+
+  def plot(data:List[String], outputFile:String):String = {
+    SystemCommands.runFullCommand(Seq(outputFile))
+  }
+}
+
 class GitWorker(repoDir:String) {
 
   implicit val program = Seq("git")
-  val gitDirectoryArguments = Seq("--git-dir="+ repoDir+ ".git", "--work-tree="+ repoDir)
+  val gitDirectoryArguments = Seq("--git-dir=" + repoDir + ".git", "--work-tree=" + repoDir)
 
   def getFirstNum(wordsString:String):Int = {
     val words = wordsString split("\\s+")
@@ -51,7 +65,7 @@ class GitWorker(repoDir:String) {
     val numStat = Seq("--numstat")
     val shortStat = Seq("--shortstat")
     val oneLine = Seq("--oneline")
-    SystemCommands.runFullCommand(gitDirectoryArguments++Seq(action, hash)++oneLine++shortStat)
+    SystemCommands.runFullCommand(gitDirectoryArguments++Seq(action, hash)++shortStat)
   }
 }
 
@@ -105,14 +119,26 @@ object RepoParser {
 
     val worker = new GitWorker(repoDir)
 
+
+    //println(prettyprinted)
     //commits.view.zipWithIndex foreach {case (value,index) => println(value,index)}
 
     for ( (commit,index) <- filteredCommits.view.zipWithIndex ) {
-        println(commit + ": " + index + " " 
-          + worker.getFilesChanged( worker.showFullCommit(commit)) + " " 
-          + worker.getLinesAdded( worker.showFullCommit(commit)) + " " 
-          + (-worker.getLinesDeleted( worker.showFullCommit(commit))) )
+        //println(
+          worker.showFullCommit(commit)
+        //)
     }
+
+    //for ( (commit,index) <- filteredCommits.view.zipWithIndex ) {
+    //    println(
+    //      //commit + ": " +
+    //       index + " " +
+    //      //+ worker.getFilesChanged( worker.showFullCommit(commit)) + " " +
+    //      worker.getLinesAdded( worker.showFullCommit(commit)) + " " +
+    //      (-worker.getLinesDeleted( worker.showFullCommit(commit))) 
+    //    )
+    //}
+
   }
 }
 
