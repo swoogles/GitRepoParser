@@ -13,4 +13,7 @@ libraryDependencies ++= Seq(
   "org.scalanlp" % "breeze-viz_2.10" % "0.5.1"
   )
 
+org.scalastyle.sbt.ScalastylePlugin.Settings
+
 mainClass := Some("RepoParser")
+
