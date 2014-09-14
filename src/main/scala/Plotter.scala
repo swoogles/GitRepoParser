@@ -11,7 +11,6 @@ case class GnuPlotter (
 object GnuPlotter {
   def plotColumn(project:String, column:Int, color:String):String = {
     "plot '../data/" + project + ".dat' using 1:" + column + " lt rgb \"" + color + "\" w line \n"
-
   }
 
   def createPlotScript(plotter:GnuPlotter, project:String) = {
@@ -22,6 +21,15 @@ object GnuPlotter {
 
     set multiplot
     """
+
+    val startCol = 2
+    val colors = List("green", "red")
+    val colRange = Range(startCol, startCol + plotter.numCols)
+
+    // After mapping elements from a range to their original values,
+    // I have a vector of values, which I then convert to a List so that I can 
+    // zip all specified columns with their respective colors
+    colRange.map(x=>x).toList zip colors foreach println
 
     val line1 = plotColumn(project, 2, "green")
     val line2 = plotColumn(project, 3, "red")
