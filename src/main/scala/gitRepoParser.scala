@@ -7,32 +7,18 @@ import scala.sys.process._
 import scala.sys.process.Process
 import com.billding.SystemCommands
 import com.billding.GnuPlotter
+import com.billding.Utility
+import com.billding.DataWriter
 
 import argonaut._, Argonaut._
 
 case class LogEntry(commit: String, author: String, date: Option[String], message: Option[String])
-
-class Utility() {
-  def printToFile(f: java.io.File)(op: java.io.PrintWriter => Unit) {
-      val p = new java.io.PrintWriter(f)
-        try { op(p) } finally { p.close() }
-  }
-}
  
 object LogEntry {
   implicit def LogEntryCodecJson: CodecJson[LogEntry] =
     casecodec4(LogEntry.apply, LogEntry.unapply)("commit", "author", "date", "message")
 }
 
-class DataWriter() {
-  def write(data:List[String], outputFile:String, utility:Utility):String = {
-    import java.io._
-    utility.printToFile(new File(outputFile))(p => {
-        data.foreach(p.println)
-    })
-    "incomplete"
-  }
-}
 
 //class GnuPlotter() {
 //  implicit val program = Seq("gnuplot")
