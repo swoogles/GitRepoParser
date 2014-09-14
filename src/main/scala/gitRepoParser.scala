@@ -124,14 +124,6 @@ object RepoParser {
     //newCommits foreach {x=>println(x)}
         
 
-    val data = List("Five","strings","in","a","file!")
-    val dataWriter:DataWriter = new DataWriter
-    val utility:Utility = new Utility
-    // init->Return all except tail
-    val dataFile = gitRepo.replaceAll("/","_").init +".dat" 
-    dataWriter.write(data, dataFile, utility)
-    println("Done")
-
     val output = for ( (commit,index) <- userCommits.view.zipWithIndex ) {
           //commit + ": " +
           index + " " +
@@ -145,11 +137,21 @@ object RepoParser {
     //val out = (commit,index) <- userCommits.view.zipWithIndex map { println }
     val out = userCommits.view.zipWithIndex 
     val outPut = out.map( x => x._1 )
-    val current = outPut.map( x => {
+
+    val current = userCommits.map( x => {
         worker.getLinesAdded( worker.showFullCommit(x)) + " " +
           (-worker.getLinesDeleted( worker.showFullCommit(x))) 
     } )
     current.foreach(println)
+
+    val data = current
+    val dataWriter:DataWriter = new DataWriter
+    val utility:Utility = new Utility
+    // init->Return all except tail
+    val dataFile = gitRepo.replaceAll("/","_").init +".dat" 
+    dataWriter.write(data, dataFile, utility)
+    println("Done")
+
   }
 }
 
