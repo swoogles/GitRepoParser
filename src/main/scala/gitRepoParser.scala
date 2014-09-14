@@ -145,7 +145,7 @@ object RepoParser {
     //      (-worker.getLinesDeleted( worker.showFullCommit(commit))) 
     //}
 
-    val out = userCommits.zipWithIndex 
+    val out = commits.zipWithIndex 
 
     val current = out.map( { case (hash,idx) => {
         idx + " " + 
