@@ -25,7 +25,6 @@ object LogEntry {
 
 class DataWriter() {
   def write(data:List[String], outputFile:String, utility:Utility):String = {
-    // Write to file
     import java.io._
     utility.printToFile(new File(outputFile))(p => {
         data.foreach(p.println)
@@ -95,6 +94,26 @@ object RepoParser {
   val repoDir= home + gitRepo
   val loggerArguments = Seq(repoDir)
 
+  def createPlotScript(project:String) = {
+    val plotSettings = """
+    set yzeroaxis
+    set ytics axis
+    set yrange [-500:500]
+
+    set multiplot
+    """
+
+    val line1 = "plot " + project + ".dat using 1:2 lt rgb \"green\" w line \n"
+    val line2 = "plot " + project + ".dat using 1:3 lt rgb \"red\" w line "
+
+    val endPlotSettings = """unset multiplot"""
+
+    plotSettings + line1 + line2 + endPlotSettings
+    
+  }
+
+
+
   def main(args: Array[String]) = 
   {
     val logOutput = SystemCommands.runFullCommand(loggerArguments)(jsonLogger)
@@ -117,26 +136,15 @@ object RepoParser {
 
     val worker = new GitWorker(repoDir)
 
-    //val newCommits = for ( (commit,index) <- userCommits.view.zipWithIndex ) 
-    //                  yield commit
-    //
-    ////newCommits foreach {x=>worker.showFullCommit(x)}
-    //newCommits foreach {x=>println(x)}
-        
+    //val output = for ( (commit,index) <- userCommits.view.zipWithIndex ) {
+    //      //commit + ": " +
+    //      index + " " +
+    //      //+ worker.getFilesChanged( worker.showFullCommit(commit)) + " " +
+    //      worker.getLinesAdded( worker.showFullCommit(commit)) + " " +
+    //      (-worker.getLinesDeleted( worker.showFullCommit(commit))) 
+    //}
 
-    val output = for ( (commit,index) <- userCommits.view.zipWithIndex ) {
-          //commit + ": " +
-          index + " " +
-          //+ worker.getFilesChanged( worker.showFullCommit(commit)) + " " +
-          worker.getLinesAdded( worker.showFullCommit(commit)) + " " +
-          (-worker.getLinesDeleted( worker.showFullCommit(commit))) 
-    }
-    // Print results
-    println(output)
-
-    //val out = (commit,inrex) <- userCommits.view.zipWithIndex map { println }
     val out = userCommits.zipWithIndex 
-    //val outPut = out.map( x => x._1 )
 
     val current = out.map( { case (hash,idx) => {
         idx + " " + 
@@ -151,8 +159,8 @@ object RepoParser {
     // init->Return all except tail
     val dataFile = gitRepo.replaceAll("/","_").init +".dat" 
     dataWriter.write(data, dataFile, utility)
+    createPlotScript(gitRepo.replaceAll("/","_"))
     println("Done")
-
   }
 }
 
