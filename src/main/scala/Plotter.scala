@@ -31,7 +31,7 @@ object GnuPlotter {
     // zip all specified columns with their respective colors
     //colRange.map(x=>x).toList zip colors foreach println
 
-    val colsAndColors = colRange.map(x=>x).toList zip colors 
+    val colsAndColors = colRange.toList zip colors 
 
     val totalPlotsReal = colsAndColors map{ entry => plotColumn(project, entry._1, entry._2) } 
 
