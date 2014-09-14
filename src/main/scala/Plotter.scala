@@ -9,6 +9,11 @@ case class GnuPlotter (
 )
 
 object GnuPlotter {
+  def plotColumn(project:String, column:Int, color:String):String = {
+    "plot '../data/" + project + ".dat' using 1:" + column + " lt rgb \"" + color + "\" w line \n"
+
+  }
+
   def createPlotScript(plotter:GnuPlotter, project:String) = {
     val plotSettings = """
     set yzeroaxis
@@ -18,8 +23,8 @@ object GnuPlotter {
     set multiplot
     """
 
-    val line1 = "plot '../data/" + project + ".dat' using 1:2 lt rgb \"green\" w line \n"
-    val line2 = "plot '../data/" + project + ".dat' using 1:3 lt rgb \"red\" w line \n"
+    val line1 = plotColumn(project, 2, "green")
+    val line2 = plotColumn(project, 3, "red")
 
     val endPlotSettings = """unset multiplot"""
 
