@@ -88,8 +88,9 @@ object RepoParser {
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
 
   //val gitRepo = "Repositories/ClashOfClans/"
-  val gitRepo = "Repositories/Physics/"
-  //val gitRepo = "NetBeansProjects/smilereminder3/"
+  //val gitRepo = "Repositories/Physics/"
+  //val gitRepo = "Repositories/Personal/"
+  val gitRepo = "NetBeansProjects/smilereminder3/"
 
   val repoDir= home + gitRepo
   val loggerArguments = Seq(repoDir)
@@ -103,8 +104,8 @@ object RepoParser {
     set multiplot
     """
 
-    val line1 = "plot " + project + ".dat using 1:2 lt rgb \"green\" w line \n"
-    val line2 = "plot " + project + ".dat using 1:3 lt rgb \"red\" w line "
+    val line1 = "plot '" + project + ".dat' using 1:2 lt rgb \"green\" w line \n"
+    val line2 = "plot '" + project + ".dat' using 1:3 lt rgb \"red\" w line \n"
 
     val endPlotSettings = """unset multiplot"""
 
@@ -159,7 +160,10 @@ object RepoParser {
     // init->Return all except tail
     val dataFile = gitRepo.replaceAll("/","_").init +".dat" 
     dataWriter.write(data, dataFile, utility)
-    createPlotScript(gitRepo.replaceAll("/","_"))
+
+    val plotScriptName = gitRepo.replaceAll("/","_").init
+    val plotScript = createPlotScript(plotScriptName)
+    dataWriter.write(List(plotScript), plotScriptName+".gnuplot", utility)
     println("Done")
   }
 }
