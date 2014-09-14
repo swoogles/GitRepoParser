@@ -35,13 +35,9 @@ object GnuPlotter {
 
     val totalPlotsReal = colsAndColors map{ entry => plotColumn(project, entry._1, entry._2) } 
 
-    val line1 = plotColumn(project, 2, "green")
-    val line2 = plotColumn(project, 3, "red")
-
     val endPlotSettings = """unset multiplot"""
 
     plotSettings + totalPlotsReal.reduce(_ + "\n" + _) + endPlotSettings
-    
   }
 }
 
