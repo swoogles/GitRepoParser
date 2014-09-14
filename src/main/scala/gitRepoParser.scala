@@ -132,16 +132,24 @@ object RepoParser {
     dataWriter.write(data, dataFile, utility)
     println("Done")
 
-    for ( (commit,index) <- userCommits.view.zipWithIndex ) {
-        println(
+    val output = for ( (commit,index) <- userCommits.view.zipWithIndex ) {
           //commit + ": " +
-           index + " " +
+          index + " " +
           //+ worker.getFilesChanged( worker.showFullCommit(commit)) + " " +
           worker.getLinesAdded( worker.showFullCommit(commit)) + " " +
           (-worker.getLinesDeleted( worker.showFullCommit(commit))) 
-        )
     }
+    // Print results
+    println(output)
 
+    //val out = (commit,index) <- userCommits.view.zipWithIndex map { println }
+    val out = userCommits.view.zipWithIndex 
+    val outPut = out.map( x => x._1 )
+    val current = outPut.map( x => {
+        worker.getLinesAdded( worker.showFullCommit(x)) + " " +
+          (-worker.getLinesDeleted( worker.showFullCommit(x))) 
+    } )
+    current.foreach(println)
   }
 }
 
