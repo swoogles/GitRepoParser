@@ -33,13 +33,13 @@ class DataWriter() {
   }
 }
 
-class GnuPlotter() {
-  implicit val program = Seq("gnuplot")
-
-  def plot(data:List[String], outputFile:String):String = {
-    SystemCommands.runFullCommand(Seq(outputFile))
-  }
-}
+//class GnuPlotter() {
+//  implicit val program = Seq("gnuplot")
+//
+//  def plot(data:List[String], outputFile:String):String = {
+//    SystemCommands.runFullCommand(Seq(outputFile))
+//  }
+//}
 
 class GitWorker(repoDir:String) {
 
@@ -80,21 +80,7 @@ class GitWorker(repoDir:String) {
   }
 }
 
-class RepoParser 
-object RepoParser {
-
-  val home = "/home/bfrasure/"
-  val git = Seq("git")
-  val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
-
-  //val gitRepo = "Repositories/ClashOfClans/"
-  val gitRepo = "Repositories/Physics/"
-  //val gitRepo = "Repositories/Personal/"
-  //val gitRepo = "NetBeansProjects/smilereminder3/"
-
-  val repoDir= home + gitRepo
-  val loggerArguments = Seq(repoDir)
-
+object GnuPlotter {
   def createPlotScript(project:String) = {
     val plotSettings = """
     set yzeroaxis
@@ -112,6 +98,24 @@ object RepoParser {
     plotSettings + line1 + line2 + endPlotSettings
     
   }
+}
+
+
+class RepoParser 
+object RepoParser {
+
+  val home = "/home/bfrasure/"
+  val git = Seq("git")
+  val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
+
+  //val gitRepo = "Repositories/ClashOfClans/"
+  val gitRepo = "Repositories/Physics/"
+  //val gitRepo = "Repositories/Personal/"
+  //val gitRepo = "NetBeansProjects/smilereminder3/"
+
+  val repoDir= home + gitRepo
+  val loggerArguments = Seq(repoDir)
+
 
 
 
@@ -162,7 +166,7 @@ object RepoParser {
     dataWriter.write(data, dataFile, utility)
 
     val plotScriptName = gitRepo.replaceAll("/","_").init
-    val plotScript = createPlotScript(plotScriptName)
+    val plotScript = GnuPlotter.createPlotScript(plotScriptName)
     dataWriter.write(List(plotScript), "plotfiles/"+plotScriptName+".gnuplot", utility)
     println("Done")
   }
