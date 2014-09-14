@@ -6,6 +6,7 @@ import util.matching.Regex
 import scala.sys.process._
 import scala.sys.process.Process
 import com.billding.SystemCommands
+import com.billding.GnuPlotter
 
 import argonaut._, Argonaut._
 
@@ -80,26 +81,6 @@ class GitWorker(repoDir:String) {
   }
 }
 
-object GnuPlotter {
-  def createPlotScript(project:String) = {
-    val plotSettings = """
-    set yzeroaxis
-    set ytics axis
-    set yrange [-500:500]
-
-    set multiplot
-    """
-
-    val line1 = "plot '../data/" + project + ".dat' using 1:2 lt rgb \"green\" w line \n"
-    val line2 = "plot '../data/" + project + ".dat' using 1:3 lt rgb \"red\" w line \n"
-
-    val endPlotSettings = """unset multiplot"""
-
-    plotSettings + line1 + line2 + endPlotSettings
-    
-  }
-}
-
 
 class RepoParser 
 object RepoParser {
@@ -108,8 +89,8 @@ object RepoParser {
   val git = Seq("git")
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
 
-  //val gitRepo = "Repositories/ClashOfClans/"
-  val gitRepo = "Repositories/Physics/"
+  val gitRepo = "Repositories/ClashOfClans/"
+  //val gitRepo = "Repositories/Physics/"
   //val gitRepo = "Repositories/Personal/"
   //val gitRepo = "NetBeansProjects/smilereminder3/"
 
