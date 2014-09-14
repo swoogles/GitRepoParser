@@ -137,7 +137,7 @@ object RepoParser {
         worker.getLinesAdded( worker.showFullCommit(hash)) + " " +
           (-worker.getLinesDeleted( worker.showFullCommit(hash))) 
     } } )
-    current.foreach(println)
+    //current.foreach(println)
 
     val data = current
     val dataWriter:DataWriter = new DataWriter
