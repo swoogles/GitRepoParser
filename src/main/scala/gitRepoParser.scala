@@ -135,10 +135,10 @@ object RepoParser {
     println(output)
 
     //val out = (commit,index) <- userCommits.view.zipWithIndex map { println }
-    val out = userCommits.view.zipWithIndex 
+    val out = userCommits.zipWithIndex 
     val outPut = out.map( x => x._1 )
 
-    val current = userCommits.map( x => {
+    val current = outPut.map( x => {
         worker.getLinesAdded( worker.showFullCommit(x)) + " " +
           (-worker.getLinesDeleted( worker.showFullCommit(x))) 
     } )
