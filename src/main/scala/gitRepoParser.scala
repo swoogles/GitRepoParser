@@ -134,14 +134,15 @@ object RepoParser {
     // Print results
     println(output)
 
-    //val out = (commit,index) <- userCommits.view.zipWithIndex map { println }
+    //val out = (commit,inrex) <- userCommits.view.zipWithIndex map { println }
     val out = userCommits.zipWithIndex 
-    val outPut = out.map( x => x._1 )
+    //val outPut = out.map( x => x._1 )
 
-    val current = outPut.map( x => {
-        worker.getLinesAdded( worker.showFullCommit(x)) + " " +
-          (-worker.getLinesDeleted( worker.showFullCommit(x))) 
-    } )
+    val current = out.map( { case (hash,idx) => {
+        idx + " " + 
+        worker.getLinesAdded( worker.showFullCommit(hash)) + " " +
+          (-worker.getLinesDeleted( worker.showFullCommit(hash))) 
+    } } )
     current.foreach(println)
 
     val data = current
