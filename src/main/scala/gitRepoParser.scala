@@ -84,16 +84,6 @@ class GitWorker(repoDir:String) {
 class RepoParser 
 object RepoParser {
 
-   val repoInput = """
-   [{
-      "commit": "03d2e959780fe2fcfccb6cd9f08e3685be9781b8",
-       "author": "Bill Frasure <bill.frasure@gmail.com>",
-        "date": "Fri Aug 15 14:03:11 2014 -0600",
-         "message": "Bring-Argonaut-into-project"
-   },
-   {...}]
-   """
-     
   val home = "/home/bfrasure/"
   val git = Seq("git")
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
@@ -109,8 +99,6 @@ object RepoParser {
   {
     val logOutput = SystemCommands.runFullCommand(loggerArguments)(jsonLogger)
     val email = args(0)
-
-    val dummyOutput = repoInput
 
     val entries = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
 
@@ -132,13 +120,11 @@ object RepoParser {
 
     val worker = new GitWorker(repoDir)
 
-
-    //println(prettyprinted)
-    //commits.view.zipWithIndex foreach {case (value,index) => println(value,index)}
-
-    val newCommits = for ( (commit,index) <- filteredCommits.view.zipWithIndex ) yield commit
-          //worker.showFullCommit(commit)
-    newCommits foreach println
+    //val newCommits = for ( (commit,index) <- filteredCommits.view.zipWithIndex ) 
+    //                  yield commit
+    //
+    ////newCommits foreach {x=>worker.showFullCommit(x)}
+    //newCommits foreach {x=>println(x)}
         
 
     val data = List("Five","strings","in","a","file!")
@@ -147,15 +133,15 @@ object RepoParser {
     dataWriter.write(data, "blah.dat", utility)
     println("Done")
 
-    //for ( (commit,index) <- filteredCommits.view.zipWithIndex ) {
-    //    println(
-    //      //commit + ": " +
-    //       index + " " +
-    //      //+ worker.getFilesChanged( worker.showFullCommit(commit)) + " " +
-    //      worker.getLinesAdded( worker.showFullCommit(commit)) + " " +
-    //      (-worker.getLinesDeleted( worker.showFullCommit(commit))) 
-    //    )
-    //}
+    for ( (commit,index) <- filteredCommits.view.zipWithIndex ) {
+        println(
+          //commit + ": " +
+           index + " " +
+          //+ worker.getFilesChanged( worker.showFullCommit(commit)) + " " +
+          worker.getLinesAdded( worker.showFullCommit(commit)) + " " +
+          (-worker.getLinesDeleted( worker.showFullCommit(commit))) 
+        )
+    }
 
   }
 }
