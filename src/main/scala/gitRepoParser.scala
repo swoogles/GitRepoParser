@@ -19,15 +19,6 @@ object LogEntry {
     casecodec4(LogEntry.apply, LogEntry.unapply)("commit", "author", "date", "message")
 }
 
-
-//class GnuPlotter() {
-//  implicit val program = Seq("gnuplot")
-//
-//  def plot(data:List[String], outputFile:String):String = {
-//    SystemCommands.runFullCommand(Seq(outputFile))
-//  }
-//}
-
 class GitWorker(repoDir:String) {
 
   implicit val program = Seq("git")
@@ -83,8 +74,17 @@ object RepoParser {
   val repoDir= home + gitRepo
   val loggerArguments = Seq(repoDir)
 
+  def writePlotScript(gitRepo:String) = {
+    val dataWriter:DataWriter = new DataWriter
+    val utility:Utility = new Utility
 
+    val plotter = new GnuPlotter
+    val plotScriptName = gitRepo.replaceAll("/","_").init
+    val plotScript = GnuPlotter.createPlotScript(plotter, plotScriptName)
+    dataWriter.write(List(plotScript), "plotfiles/"+plotScriptName+".gnuplot", utility)
+  }
 
+  //def getCommits(
 
   def main(args: Array[String]) = 
   {
@@ -97,24 +97,8 @@ object RepoParser {
 
     val userEntries = entries.filter(_.author contains email )
     val userCommits = userEntries.map(x=>x.commit)
-     
-    val json = userEntries.asJson
-
-    val prettyprinted: String =
-      json.spaces4
-
-    val parsed: Option[LogEntry] =
-      prettyprinted.decodeOption[LogEntry]
 
     val worker = new GitWorker(repoDir)
-
-    //val output = for ( (commit,index) <- userCommits.view.zipWithIndex ) {
-    //      //commit + ": " +
-    //      index + " " +
-    //      //+ worker.getFilesChanged( worker.showFullCommit(commit)) + " " +
-    //      worker.getLinesAdded( worker.showFullCommit(commit)) + " " +
-    //      (-worker.getLinesDeleted( worker.showFullCommit(commit))) 
-    //}
 
     val out = userCommits.zipWithIndex 
 
@@ -123,7 +107,6 @@ object RepoParser {
         worker.getLinesAdded( worker.showFullCommit(hash)) + " " +
           (-worker.getLinesDeleted( worker.showFullCommit(hash))) 
     } } )
-    //current.foreach(println)
 
     val data = current
     val dataWriter:DataWriter = new DataWriter
@@ -132,12 +115,7 @@ object RepoParser {
     val dataFile = "data/" + gitRepo.replaceAll("/","_").init +".dat" 
     dataWriter.write(data, dataFile, utility)
 
-    val plotter = new GnuPlotter
-
-    val plotScriptName = gitRepo.replaceAll("/","_").init
-    val plotScript = GnuPlotter.createPlotScript(plotter, plotScriptName)
-    dataWriter.write(List(plotScript), "plotfiles/"+plotScriptName+".gnuplot", utility)
-    println("Done")
+    writePlotScript(gitRepo)
   }
 }
 
