@@ -98,7 +98,8 @@ object RepoParser {
   val git = Seq("git")
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
 
-  val gitRepo = "Repositories/ClashOfClans/"
+  //val gitRepo = "Repositories/ClashOfClans/"
+  val gitRepo = "Repositories/Physics/"
   //val gitRepo = "NetBeansProjects/smilereminder3/"
 
   val repoDir= home + gitRepo
