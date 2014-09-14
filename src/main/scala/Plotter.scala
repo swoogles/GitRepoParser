@@ -32,24 +32,15 @@ object GnuPlotter {
     //colRange.map(x=>x).toList zip colors foreach println
 
     val colsAndColors = colRange.map(x=>x).toList zip colors 
-    println(colsAndColors)
-
-    val totalPlots = colsAndColors match{ case entry => plotColumn(project, entry.head._1, entry.head._2) }
 
     val totalPlotsReal = colsAndColors map{ entry => plotColumn(project, entry._1, entry._2) } 
-
-    println(totalPlotsReal)
-
-    for ( (col,colors) <- colsAndColors ) {
-      println("Boo!")
-    }
 
     val line1 = plotColumn(project, 2, "green")
     val line2 = plotColumn(project, 3, "red")
 
     val endPlotSettings = """unset multiplot"""
 
-    plotSettings + line1 + line2 + endPlotSettings
+    plotSettings + totalPlotsReal.reduce(_ + "\n" + _) + endPlotSettings
     
   }
 }
