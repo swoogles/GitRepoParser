@@ -104,10 +104,10 @@ object RepoParser {
 
     val commits = entries.map(x=>x.commit)
 
-    val filteredEntries = entries.filter(_.author contains email )
-    val filteredCommits = filteredEntries.map(x=>x.commit)
+    val userEntries = entries.filter(_.author contains email )
+    val userCommits = userEntries.map(x=>x.commit)
      
-    val json = filteredEntries.asJson
+    val json = userEntries.asJson
 
     val prettyprinted: String =
       json.spaces4
@@ -117,7 +117,7 @@ object RepoParser {
 
     val worker = new GitWorker(repoDir)
 
-    //val newCommits = for ( (commit,index) <- filteredCommits.view.zipWithIndex ) 
+    //val newCommits = for ( (commit,index) <- userCommits.view.zipWithIndex ) 
     //                  yield commit
     //
     ////newCommits foreach {x=>worker.showFullCommit(x)}
@@ -127,10 +127,12 @@ object RepoParser {
     val data = List("Five","strings","in","a","file!")
     val dataWriter:DataWriter = new DataWriter
     val utility:Utility = new Utility
-    dataWriter.write(data, "blah.dat", utility)
+    // init->Return all except tail
+    val dataFile = gitRepo.replaceAll("/","_").init +".dat" 
+    dataWriter.write(data, dataFile, utility)
     println("Done")
 
-    for ( (commit,index) <- filteredCommits.view.zipWithIndex ) {
+    for ( (commit,index) <- userCommits.view.zipWithIndex ) {
         println(
           //commit + ": " +
            index + " " +
