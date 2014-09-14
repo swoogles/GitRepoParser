@@ -104,10 +104,7 @@ object RepoParser {
 
     val commits = entries.map(x=>x.commit)
 
-    val niceEntries = entries.map(entry =>
-        entry.copy(date = entry.date.orElse(Some("Date"))))
-
-    val filteredEntries = niceEntries.filter(_.author contains email )
+    val filteredEntries = entries.filter(_.author contains email )
     val filteredCommits = filteredEntries.map(x=>x.commit)
      
     val json = filteredEntries.asJson
