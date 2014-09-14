@@ -146,8 +146,10 @@ object RepoParser {
     val dataFile = "data/" + gitRepo.replaceAll("/","_").init +".dat" 
     dataWriter.write(data, dataFile, utility)
 
+    val plotter = new GnuPlotter
+
     val plotScriptName = gitRepo.replaceAll("/","_").init
-    val plotScript = GnuPlotter.createPlotScript(plotScriptName)
+    val plotScript = GnuPlotter.createPlotScript(plotter, plotScriptName)
     dataWriter.write(List(plotScript), "plotfiles/"+plotScriptName+".gnuplot", utility)
     println("Done")
   }

@@ -1,11 +1,19 @@
 package com.billding
 
+case class GnuPlotter (
+  yMax:Int = 500,
+  yMin:Int = -500,
+  xMax:Int = 0,
+  xMin:Int = 0,
+  numCols:Int = 2
+)
+
 object GnuPlotter {
-  def createPlotScript(project:String) = {
+  def createPlotScript(plotter:GnuPlotter, project:String) = {
     val plotSettings = """
     set yzeroaxis
     set ytics axis
-    set yrange [-500:500]
+    set yrange [""" + plotter.yMin + ":" + plotter.yMax + """]
 
     set multiplot
     """
