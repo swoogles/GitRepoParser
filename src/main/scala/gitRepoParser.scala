@@ -109,8 +109,8 @@ object RepoParser {
     val dataWriter:DataWriter = new DataWriter
     val utility:Utility = new Utility
     // init->Return all except tail
-    val dataFile = "data/" + gitRepo.replaceAll("/","_").init +".dat" 
-    dataWriter.write(data, dataFile, utility)
+    val dataFileName = "data/" + gitRepo.replaceAll("/","_").init +".dat" 
+    dataWriter.write(data, dataFileName, utility)
 
     val plotter = new GnuPlotter
     val plotScriptName = gitRepo.replaceAll("/","_").init
