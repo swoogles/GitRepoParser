@@ -74,14 +74,12 @@ object RepoParser {
   val repoDir= home + gitRepo
   val loggerArguments = Seq(repoDir)
 
-  def writePlotScript(gitRepo:String) = {
+  def writePlotScript(gitRepo:String, data:List[String]) = {
     val dataWriter:DataWriter = new DataWriter
     val utility:Utility = new Utility
 
-    val plotter = new GnuPlotter
     val plotScriptName = gitRepo.replaceAll("/","_").init
-    val plotScript = GnuPlotter.createPlotScript(plotter, plotScriptName)
-    dataWriter.write(List(plotScript), "plotfiles/"+plotScriptName+".gnuplot", utility)
+    dataWriter.write(data, "plotfiles/"+plotScriptName+".gnuplot", utility)
   }
 
   //def getCommits(
@@ -102,20 +100,25 @@ object RepoParser {
 
     val out = userCommits.zipWithIndex 
 
-    val current = out.map( { case (hash,idx) => {
+    val data = out.map( { case (hash,idx) => {
         idx + " " + 
         worker.getLinesAdded( worker.showFullCommit(hash)) + " " +
           (-worker.getLinesDeleted( worker.showFullCommit(hash))) 
     } } )
 
-    val data = current
     val dataWriter:DataWriter = new DataWriter
     val utility:Utility = new Utility
     // init->Return all except tail
     val dataFile = "data/" + gitRepo.replaceAll("/","_").init +".dat" 
     dataWriter.write(data, dataFile, utility)
 
-    writePlotScript(gitRepo)
+    val plotter = new GnuPlotter
+    val plotScriptName = gitRepo.replaceAll("/","_").init
+    val plotScriptData = List(GnuPlotter.createPlotScript(plotter, plotScriptName))
+
+    writePlotScript(gitRepo, plotScriptData)
+
+    println
   }
 }
 
