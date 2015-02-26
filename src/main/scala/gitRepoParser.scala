@@ -58,6 +58,18 @@ class GitWorker(repoDir:String) {
   }
 }
 
+case class CommitDelta(idx: Long, linesAdded: Long, linesDeleted: Long)
+{
+  override def toString(): String = {
+    idx + " " + 
+    linesAdded + " " +
+    linesDeleted
+  }
+}
+object CommitDelta {
+  implicit def stringifier(cd: CommitDelta): String = cd.toString
+}
+
 
 class RepoParser 
 object RepoParser {
@@ -74,8 +86,6 @@ object RepoParser {
     dataWriter.write(data, "plotfiles/"+plotScriptName+".gnuplot", utility)
   }
 
-  //def getCommits(
-
   def main(args: Array[String]) = 
   {
     val email = args(0)
@@ -88,26 +98,28 @@ object RepoParser {
 
     val entries = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
 
-    val commits = entries.map(x=>x.commit)
-
     val userEntries = entries.filter(_.author contains email )
     val userCommits = userEntries.map(x=>x.commit)
 
     val worker = new GitWorker(repoDir)
 
-    val out = userCommits.zipWithIndex 
+    val commitDeltas: List[CommitDelta] = userCommits.zipWithIndex map {
+      case (hash,idx) => {
+        CommitDelta(
+          idx, 
+          worker.getLinesAdded( worker.showFullCommit(hash)),
+          -worker.getLinesDeleted( worker.showFullCommit(hash))
+        )
+      } 
+    }
 
-    val data = out.map( { case (hash,idx) => {
-        idx + " " + 
-        worker.getLinesAdded( worker.showFullCommit(hash)) + " " +
-          (-worker.getLinesDeleted( worker.showFullCommit(hash))) 
-    } } )
+    val deltaPlots = commitDeltas.map { x => x.toString }
 
     val dataWriter:DataWriter = new DataWriter
     val utility:Utility = new Utility
     // init->Return all except tail
     val dataFileName = "data/" + gitRepo.replaceAll("/","_").init +".dat" 
-    dataWriter.write(data, dataFileName, utility)
+    dataWriter.write(deltaPlots, dataFileName, utility)
 
     val plotter = new GnuPlotter
     val plotScriptName = gitRepo.replaceAll("/","_").init
