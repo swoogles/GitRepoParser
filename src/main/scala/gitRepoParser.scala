@@ -66,14 +66,6 @@ object RepoParser {
   val git = Seq("git")
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
 
-  val gitRepo = "Repositories/ClashOfClans/"
-  //val gitRepo = "Repositories/Physics/"
-  //val gitRepo = "Repositories/Personal/"
-  //val gitRepo = "NetBeansProjects/smilereminder3/"
-
-  val repoDir= home + gitRepo
-  val loggerArguments = Seq(repoDir)
-
   def writePlotScript(gitRepo:String, data:List[String]) = {
     val dataWriter:DataWriter = new DataWriter
     val utility:Utility = new Utility
@@ -86,8 +78,13 @@ object RepoParser {
 
   def main(args: Array[String]) = 
   {
-    val logOutput = SystemCommands.runFullCommand(loggerArguments)(jsonLogger)
     val email = args(0)
+    val gitRepo = args(1)
+
+    val repoDir= home + gitRepo
+    val loggerArguments = Seq(repoDir)
+
+    val logOutput = SystemCommands.runFullCommand(loggerArguments)(jsonLogger)
 
     val entries = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
 
