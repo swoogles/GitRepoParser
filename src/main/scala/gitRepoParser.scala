@@ -19,6 +19,8 @@ object LogEntry {
     casecodec4(LogEntry.apply, LogEntry.unapply)("commit", "author", "date", "message")
 }
 
+case class GitHash( hash: String)
+
 class GitWorker(repoDir:String) {
 
   implicit val program = Seq("git")
@@ -54,12 +56,12 @@ class GitWorker(repoDir:String) {
     getNumberWithPattern(commitInfo, "deletions")
   }
 
-  def showFullCommit(hash:String):String = {
+  def showFullCommit(gitHash: GitHash):String = {
     val action = "show"
     val numStat = Seq("--numstat")
     val shortStat = Seq("--shortstat")
     val oneLine = Seq("--oneline")
-    SystemCommands.runFullCommand(gitDirectoryArguments++Seq(action, hash)++shortStat)
+    SystemCommands.runFullCommand(gitDirectoryArguments++Seq(action, gitHash.hash)++shortStat)
   }
 }
 
@@ -102,11 +104,11 @@ object RepoParser {
     val entries = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
 
     val userEntries = entries.filter(_.author contains email )
-    val userCommitHashes = userEntries.map(x=>x.commit)
+    val userHashes = userEntries.map(x=>GitHash(x.commit))
 
     val worker = new GitWorker(repoDir)
 
-    val commitDeltas: List[CommitDelta] = userCommitHashes.zipWithIndex map {
+    val commitDeltas: List[CommitDelta] = userHashes.zipWithIndex map {
       case (hash,idx) => {
         CommitDelta(
           idx, 
