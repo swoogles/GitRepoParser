@@ -72,7 +72,7 @@ object CommitDelta {
 }
 
 
-class RepoParser 
+//class RepoParser 
 object RepoParser {
 
   val home = "/home/bfrasure/"
