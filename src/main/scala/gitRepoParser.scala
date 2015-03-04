@@ -38,16 +38,20 @@ class GitWorker(repoDir:String) {
       0
   }
 
+  implicit def stringToRegex(patternString: String): Regex = {
+    patternString.r
+  }
+
   def getFilesChanged(commitInfo:String):Int = {
-    getNumberWithPattern(commitInfo, "files? changed".r)
+    getNumberWithPattern(commitInfo, "files? changed")
   }
 
   def getLinesAdded(commitInfo:String):Int = {
-    getNumberWithPattern(commitInfo, "insertions".r)
+    getNumberWithPattern(commitInfo, "insertions")
   }
 
   def getLinesDeleted(commitInfo:String):Int = {
-    getNumberWithPattern(commitInfo, "deletions".r)
+    getNumberWithPattern(commitInfo, "deletions")
   }
 
   def showFullCommit(hash:String):String = {
