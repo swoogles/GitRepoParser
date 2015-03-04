@@ -30,7 +30,8 @@ class GitWorker(repoDir:String) {
   }
 
   def getNumberWithPattern(commitInfo:String, pattern: Regex ):Int = {
-    val matchingStrings = pattern findAllIn commitInfo
+    val combinedRegex = ("\\d+ " + pattern.toString).r
+    val matchingStrings = combinedRegex findAllIn commitInfo
     if (matchingStrings nonEmpty)
       getFirstNum(matchingStrings next) 
     else
@@ -38,15 +39,15 @@ class GitWorker(repoDir:String) {
   }
 
   def getFilesChanged(commitInfo:String):Int = {
-    getNumberWithPattern(commitInfo, "\\d+ files? changed".r)
+    getNumberWithPattern(commitInfo, "files? changed".r)
   }
 
   def getLinesAdded(commitInfo:String):Int = {
-    getNumberWithPattern(commitInfo, "\\d+ insertions".r)
+    getNumberWithPattern(commitInfo, "insertions".r)
   }
 
   def getLinesDeleted(commitInfo:String):Int = {
-    getNumberWithPattern(commitInfo, "\\d+ deletions".r)
+    getNumberWithPattern(commitInfo, "deletions".r)
   }
 
   def showFullCommit(hash:String):String = {
