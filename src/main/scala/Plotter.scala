@@ -9,6 +9,13 @@ case class GnuPlotter (
 )
 
 object GnuPlotter {
+  val filename = "programmatic.png"
+
+  val imageOutput = s"""
+    set term png
+    set output "$filename"
+  """
+
   def plotColumn(project:String, column:Int, color:String):String = {
     "plot '../data/" + project + ".dat' using 1:" + column + " lt rgb \"" + color + "\" w line \n"
   }
@@ -37,7 +44,7 @@ object GnuPlotter {
 
     val endPlotSettings = """unset multiplot"""
 
-    plotSettings + totalPlotsReal.reduce(_ + "\n" + _) + endPlotSettings
+    imageOutput + plotSettings + totalPlotsReal.reduce(_ + "\n" + _) + endPlotSettings
   }
 }
 
