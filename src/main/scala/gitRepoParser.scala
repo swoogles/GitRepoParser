@@ -71,8 +71,6 @@ object CommitDelta {
   implicit def stringifier(cd: CommitDelta): String = cd.toString
 }
 
-
-//class RepoParser 
 object RepoParser {
 
   val home = "/home/bfrasure/"
@@ -80,8 +78,8 @@ object RepoParser {
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
 
   def writePlotScript(gitRepo:String, data:List[String]) = {
-    val dataWriter:DataWriter = new DataWriter
-    val utility:Utility = new Utility
+    val dataWriter: DataWriter = new DataWriter
+    val utility: Utility = new Utility
 
     val plotScriptName = gitRepo.replaceAll("/","_").init
     dataWriter.write(data, "plotfiles/"+plotScriptName+".gnuplot", utility)
@@ -100,11 +98,11 @@ object RepoParser {
     val entries = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
 
     val userEntries = entries.filter(_.author contains email )
-    val userCommits = userEntries.map(x=>x.commit)
+    val userCommitHashes = userEntries.map(x=>x.commit)
 
     val worker = new GitWorker(repoDir)
 
-    val commitDeltas: List[CommitDelta] = userCommits.zipWithIndex map {
+    val commitDeltas: List[CommitDelta] = userCommitHashes.zipWithIndex map {
       case (hash,idx) => {
         CommitDelta(
           idx, 
