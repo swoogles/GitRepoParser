@@ -120,16 +120,19 @@ class ParserActor extends Actor with ActorLogging{
 }
 
 
-object GitDataFileCreator {
+class GitDataFileCreator(
+  gitRepo: String
+)
+{
   val dataWriter: DataWriter = new DataWriter
   val utility: Utility = new Utility
 
-  def writePlotScript(gitRepo:String, data:List[String]) = {
+  def writePlotScript(data:List[String]) = {
     val plotScriptName = gitRepo.replaceAll("/","_").init
     dataWriter.write(data, "plotfiles/"+plotScriptName+".gnuplot", utility)
   }
 
-  def writeDataFile(gitRepo:String, data:List[String]) = {
+  def writeDataFile(data:List[String]) = {
     val dataFileName = "data/" + gitRepo.replaceAll("/","_").init +".dat" 
     dataWriter.write(data, dataFileName, utility)
   }
@@ -191,13 +194,14 @@ object GitManager {
 
     val deltaPlots = commitDeltas.map { x => x.toString }
 
-    GitDataFileCreator.writeDataFile(gitRepo, deltaPlots)
+    val dataFileCreator = new GitDataFileCreator(gitRepo)
+    dataFileCreator.writeDataFile(deltaPlots)
 
     val plotter = new GnuPlotter
     val plotScriptName = gitRepo.replaceAll("/","_").init
     val plotScriptData = List(plotter.createPlotScript(plotScriptName))
 
-    GitDataFileCreator.writePlotScript(gitRepo, plotScriptData)
+    dataFileCreator.writePlotScript(plotScriptData)
 
     println
   }
