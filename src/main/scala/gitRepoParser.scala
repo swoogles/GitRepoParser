@@ -89,6 +89,7 @@ case class CommitDelta(idx: Long, linesAdded: Long, linesDeleted: Long)
 }
 object CommitDelta {
   implicit def stringifier(cd: CommitDelta): String = cd.toString
+  implicit def multiStringifier(cds: List[CommitDelta]): List[String] = cds map { cd => cd.toString }
 }
 
 import akka.actor.{ ActorLogging, ActorRef, ActorSystem, Props, Actor, Inbox }
@@ -199,10 +200,8 @@ object GitManager {
 
     val commitDeltas: List[CommitDelta] = commitParser.createDeltas(userHashes)
 
-    val deltaPlots = commitDeltas.map { x => x.toString }
-
     val dataFileCreator = new GitDataFileCreator(gitRepo)
-    dataFileCreator.writeDataFile(deltaPlots)
+    dataFileCreator.writeDataFile(commitDeltas)
 
     val plotter = new GnuPlotter
     val plotScriptName = gitRepo.replaceAll("/","_").init
