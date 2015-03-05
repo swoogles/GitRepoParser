@@ -165,10 +165,12 @@ object GitManager {
     val email = args(0)
     val gitRepo = args(1)
 
-    val repoDir= home + gitRepo
+    val repoDir= home + gitRepo + "/"
     val loggerArguments = Seq(repoDir)
 
+    println("Bah")
     val logOutput = SystemCommands.runFullCommand(loggerArguments)(jsonLogger)
+    println("Boo")
 
     //println("logOutput: " + logOutput)
 
