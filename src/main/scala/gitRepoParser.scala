@@ -64,6 +64,19 @@ class CommitParser(repoDir:String) {
     val oneLine = Seq("--oneline")
     SystemCommands.runFullCommand(gitDirectoryArguments++Seq(action, gitHash.hash)++shortStat)
   }
+
+  def createDeltas(hashes: List[GitHash]): List[CommitDelta] = {
+    val commitDeltas: List[CommitDelta] = hashes.zipWithIndex map {
+      case (hash,idx) => {
+        CommitDelta(
+          idx, 
+          getLinesAdded(hash),
+          -getLinesDeleted(hash)
+        )
+      } 
+    }
+    commitDeltas
+  }
 }
 
 case class CommitDelta(idx: Long, linesAdded: Long, linesDeleted: Long)
@@ -124,16 +137,17 @@ class GitDataFileCreator(
   gitRepo: String
 )
 {
+  val repoFileName: String = gitRepo.replaceAll("/","_").init
   val dataWriter: DataWriter = new DataWriter
   val utility: Utility = new Utility
 
   def writePlotScript(data:List[String]) = {
-    val plotScriptName = gitRepo.replaceAll("/","_").init
-    dataWriter.write(data, "plotfiles/"+plotScriptName+".gnuplot", utility)
+    val plotScriptName = "plotfiles/" + repoFileName + ".gnuplot"
+    dataWriter.write(data, plotScriptName, utility)
   }
 
   def writeDataFile(data:List[String]) = {
-    val dataFileName = "data/" + gitRepo.replaceAll("/","_").init +".dat" 
+    val dataFileName = "data/" + repoFileName +".dat" 
     dataWriter.write(data, dataFileName, utility)
   }
 }
@@ -178,19 +192,12 @@ object GitManager {
     val entries: List[LogEntry] = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
 
     val userEntries = entries.filter(_.author contains email )
+
     val userHashes = userEntries.map(x=>GitHash(x.commit))
 
     val commitParser = new CommitParser(repoDir)
 
-    val commitDeltas: List[CommitDelta] = userHashes.zipWithIndex map {
-      case (hash,idx) => {
-        CommitDelta(
-          idx, 
-          commitParser.getLinesAdded(hash),
-          -commitParser.getLinesDeleted(hash)
-        )
-      } 
-    }
+    val commitDeltas: List[CommitDelta] = commitParser.createDeltas(userHashes)
 
     val deltaPlots = commitDeltas.map { x => x.toString }
 
