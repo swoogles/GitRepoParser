@@ -168,9 +168,7 @@ object GitManager {
     val repoDir= home + gitRepo + "/"
     val loggerArguments = Seq(repoDir)
 
-    println("Bah")
     val logOutput = SystemCommands.runFullCommand(loggerArguments)(jsonLogger)
-    println("Boo")
 
     //println("logOutput: " + logOutput)
 
@@ -197,7 +195,7 @@ object GitManager {
 
     val plotter = new GnuPlotter
     val plotScriptName = gitRepo.replaceAll("/","_").init
-    val plotScriptData = List(GnuPlotter.createPlotScript(plotter, plotScriptName))
+    val plotScriptData = List(plotter.createPlotScript(plotScriptName))
 
     GitDataFileCreator.writePlotScript(gitRepo, plotScriptData)
 
