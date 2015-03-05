@@ -16,5 +16,5 @@ libraryDependencies ++= Seq(
 
 org.scalastyle.sbt.ScalastylePlugin.Settings
 
-mainClass := Some("RepoParser")
+mainClass := Some("GitManager")
 

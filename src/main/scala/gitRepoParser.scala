@@ -122,7 +122,7 @@ class ParserActor extends Actor with ActorLogging{
 
 
 
-object RepoParser {
+object GitManager {
 
   val home = "/home/bfrasure/"
   val git = Seq("git")
