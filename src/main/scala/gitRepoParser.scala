@@ -21,7 +21,7 @@ object LogEntry {
 
 case class GitHash( hash: String)
 
-class GitWorker(repoDir:String) {
+class CommitParser(repoDir:String) {
 
   implicit val program = Seq("git")
   val gitDirectoryArguments = Seq("--git-dir=" + repoDir + ".git", "--work-tree=" + repoDir)
@@ -177,14 +177,14 @@ object GitManager {
     val userEntries = entries.filter(_.author contains email )
     val userHashes = userEntries.map(x=>GitHash(x.commit))
 
-    val worker = new GitWorker(repoDir)
+    val commitParser = new CommitParser(repoDir)
 
     val commitDeltas: List[CommitDelta] = userHashes.zipWithIndex map {
       case (hash,idx) => {
         CommitDelta(
           idx, 
-          worker.getLinesAdded(hash),
-          -worker.getLinesDeleted(hash)
+          commitParser.getLinesAdded(hash),
+          -commitParser.getLinesDeleted(hash)
         )
       } 
     }
