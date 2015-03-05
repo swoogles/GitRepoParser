@@ -103,7 +103,10 @@ class Greeter extends Actor {
       var repo = ""
 
       def receive = {
-        case RepoToExamine(url) => sender ! retrieveRepoCommits(url)
+        case RepoToExamine(url) => {
+          println("sender: " + sender)
+          sender ! RepoData(retrieveRepoCommits(url))
+        }
         //case Greet           => sender ! RepoData(3, "projectNameA")
       }
 
@@ -123,6 +126,9 @@ class Greeter extends Actor {
     class ParserActor extends Actor with ActorLogging{
       def receive = {
         case RepoData(entries) => println("first entry: " + entries.head)
+        case unknown => {
+          log.info("Unknown result: " + unknown)
+        }
       }
     }
 
@@ -151,6 +157,7 @@ class Greeter extends Actor {
         val parser = system.actorOf(Props[ParserActor], "parser")
         val examiner = system.actorOf(Props[RepoExaminer], "examiner")
 
+        println("parser(sender): " + parser)
         examiner.tell(targetRepo, parser)
 
 
@@ -171,6 +178,9 @@ class Greeter extends Actor {
         val Greeting(message) = inbox.receive(5.seconds)
         println(s"Greeting: $message")
 
+        //system.stop
+        //system.awaitTermination()
+        Thread.sleep(1000)
         system.shutdown
         println
       }
