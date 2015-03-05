@@ -31,7 +31,8 @@ class GitWorker(repoDir:String) {
     words(0).toInt
   }
 
-  def getNumberWithPattern(commitInfo:String, pattern: Regex ):Int = {
+  def getNumberWithPattern(hash: GitHash, pattern: Regex ):Int = {
+    val commitInfo = showFullCommit(hash)
     val combinedRegex = ("\\d+ " + pattern.toString).r
     val matchingStrings = combinedRegex findAllIn commitInfo
     if (matchingStrings nonEmpty)
@@ -44,16 +45,16 @@ class GitWorker(repoDir:String) {
     patternString.r
   }
 
-  def getFilesChanged(commitInfo:String):Int = {
-    getNumberWithPattern(commitInfo, "files? changed")
+  def getFilesChanged(hash: GitHash):Int = {
+    getNumberWithPattern(hash, "files? changed")
   }
 
-  def getLinesAdded(commitInfo:String):Int = {
-    getNumberWithPattern(commitInfo, "insertions")
+  def getLinesAdded(hash: GitHash):Int = {
+    getNumberWithPattern(hash, "insertions")
   }
 
-  def getLinesDeleted(commitInfo:String):Int = {
-    getNumberWithPattern(commitInfo, "deletions")
+  def getLinesDeleted(hash: GitHash):Int = {
+    getNumberWithPattern(hash, "deletions")
   }
 
   def showFullCommit(gitHash: GitHash):String = {
@@ -175,8 +176,8 @@ object RepoParser {
       case (hash,idx) => {
         CommitDelta(
           idx, 
-          worker.getLinesAdded( worker.showFullCommit(hash)),
-          -worker.getLinesDeleted( worker.showFullCommit(hash))
+          worker.getLinesAdded(hash),
+          -worker.getLinesDeleted(hash)
         )
       } 
     }
