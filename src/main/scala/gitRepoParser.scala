@@ -120,6 +120,20 @@ class ParserActor extends Actor with ActorLogging{
 }
 
 
+object GitDataFileCreator {
+  val dataWriter: DataWriter = new DataWriter
+  val utility: Utility = new Utility
+
+  def writePlotScript(gitRepo:String, data:List[String]) = {
+    val plotScriptName = gitRepo.replaceAll("/","_").init
+    dataWriter.write(data, "plotfiles/"+plotScriptName+".gnuplot", utility)
+  }
+
+  def writeDataFile(gitRepo:String, data:List[String]) = {
+    val dataFileName = "data/" + gitRepo.replaceAll("/","_").init +".dat" 
+    dataWriter.write(data, dataFileName, utility)
+  }
+}
 
 
 object GitManager {
@@ -128,13 +142,6 @@ object GitManager {
   val git = Seq("git")
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
 
-  def writePlotScript(gitRepo:String, data:List[String]) = {
-    val dataWriter: DataWriter = new DataWriter
-    val utility: Utility = new Utility
-
-    val plotScriptName = gitRepo.replaceAll("/","_").init
-    dataWriter.write(data, "plotfiles/"+plotScriptName+".gnuplot", utility)
-  }
 
   def actorTest(): Unit = {
     val system = ActorSystem("helloakka")
@@ -184,17 +191,13 @@ object GitManager {
 
     val deltaPlots = commitDeltas.map { x => x.toString }
 
-    val dataWriter:DataWriter = new DataWriter
-    val utility:Utility = new Utility
-    // init->Return all except tail
-    val dataFileName = "data/" + gitRepo.replaceAll("/","_").init +".dat" 
-    dataWriter.write(deltaPlots, dataFileName, utility)
+    GitDataFileCreator.writeDataFile(gitRepo, deltaPlots)
 
     val plotter = new GnuPlotter
     val plotScriptName = gitRepo.replaceAll("/","_").init
     val plotScriptData = List(GnuPlotter.createPlotScript(plotter, plotScriptName))
 
-    writePlotScript(gitRepo, plotScriptData)
+    GitDataFileCreator.writePlotScript(gitRepo, plotScriptData)
 
     println
   }
