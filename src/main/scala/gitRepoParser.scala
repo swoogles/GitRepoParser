@@ -232,7 +232,7 @@ object GitManager {
     val repoDir= home + gitRepo + "/"
 
     val repos = List(
-      "AudioHand/",
+      "AudioHand/Mixer",
       "ClashOfClans/",
       "GitRepoParser/",
       "Latex/"

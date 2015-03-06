@@ -9,11 +9,12 @@ case class GnuPlotter (
   filename: String = "programmatic.png"
 ) {
 
+  def createPlotScript(project:String) = {
   val imageOutput = s"""
     set term png
-    set output "$filename"
+    set output "$project.png"
   """
-  def createPlotScript(project:String) = {
+
     val plotSettings = s"""
     set yzeroaxis
     set ytics axis
