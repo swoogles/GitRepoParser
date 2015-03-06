@@ -105,8 +105,6 @@ class RepoExaminer extends Actor with ActorLogging{
   val git = Seq("git")
   val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
 
-  var repo = ""
-
   def receive = {
     case RepoToExamine(url) => {
       sender ! retrieveRepoData(url)
@@ -134,11 +132,22 @@ class ParserActor extends Actor with ActorLogging{
   }
 }
 
+case class PlotScriptData(data:List[String])
+case class DataFileData(data:List[String])
 
+object GitDataFileCreator {
+  def props(gitRepo: String): Props = Props(new GitDataFileCreator(gitRepo))
+}
 class GitDataFileCreator(
   gitRepo: String
-)
+) extends Actor with ActorLogging
 {
+  def receive = {
+    case RepoData(entries) => println("first entry: " + entries.head)
+    case PlotScriptData(data) => writePlotScript(data)
+    case DataFileData(data) => writeDataFile(data)
+  }
+
   val repoFileName: String = gitRepo.replaceAll("/","_").init
   val dataWriter: DataWriter = new DataWriter
   val utility: Utility = new Utility
@@ -195,16 +204,20 @@ object GitManager {
 
     val commitDeltas: List[CommitDelta] = commitParser.createDeltas(userHashes)
 
-    val dataFileCreator = new GitDataFileCreator(gitRepo)
-    dataFileCreator.writeDataFile(commitDeltas)
+    val system = ActorSystem("helloakka")
+    val dataFileCreator = system.actorOf(GitDataFileCreator.props(gitRepo), "dataFileCreator")
 
+    dataFileCreator ! DataFileData(commitDeltas)
+
+    val repoFileName: String = gitRepo.replaceAll("/","_").init
     val plotter = new GnuPlotter
-    val plotScriptName = dataFileCreator.repoFileName
+    val plotScriptName = repoFileName
     val plotScriptData = List(plotter.createPlotScript(plotScriptName))
 
-    dataFileCreator.writePlotScript(plotScriptData)
+    dataFileCreator ! PlotScriptData(plotScriptData)
 
+    Thread.sleep(1000)
+    system.shutdown
     println
   }
 }
-
