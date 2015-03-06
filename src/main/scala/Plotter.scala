@@ -14,10 +14,10 @@ case class GnuPlotter (
     set output "$filename"
   """
   def createPlotScript(project:String) = {
-    val plotSettings = """
+    val plotSettings = s"""
     set yzeroaxis
     set ytics axis
-    set yrange [""" + yMin + ":" + yMax + """]
+    set yrange [$yMin:$yMax]
 
     set multiplot
     """
