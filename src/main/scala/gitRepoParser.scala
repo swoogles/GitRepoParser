@@ -19,6 +19,17 @@ object LogEntry {
     casecodec4(LogEntry.apply, LogEntry.unapply)("commit", "author", "date", "message")
 }
 
+class JsonLogger(repoDir:String) {
+  implicit val program = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
+
+  def repoLogs() = {
+    val loggerArguments = Seq(repoDir)
+    val logOutput = SystemCommands.runFullCommand(loggerArguments)
+    val entries: List[LogEntry] = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
+    entries
+  }
+}
+
 case class GitHash( hash: String)
 
 class CommitParser(repoDir:String) {
@@ -45,17 +56,9 @@ class CommitParser(repoDir:String) {
     patternString.r
   }
 
-  def getFilesChanged(hash: GitHash):Int = {
-    getNumberWithPattern(hash, "files? changed")
-  }
-
-  def getLinesAdded(hash: GitHash):Int = {
-    getNumberWithPattern(hash, "insertions")
-  }
-
-  def getLinesDeleted(hash: GitHash):Int = {
-    getNumberWithPattern(hash, "deletions")
-  }
+  def getFilesChanged(hash: GitHash):Int = getNumberWithPattern(hash, "files? changed")
+  def getLinesAdded(hash: GitHash):Int = getNumberWithPattern(hash, "insertions")
+  def getLinesDeleted(hash: GitHash):Int = getNumberWithPattern(hash, "deletions")
 
   def showFullCommit(gitHash: GitHash):String = {
     val action = "show"
@@ -112,12 +115,10 @@ class RepoExaminer extends Actor with ActorLogging{
   }
 
   def retrieveRepoData(gitRepo: String): RepoData = {
-
     val repoDir= home + gitRepo
-    val loggerArguments = Seq(repoDir)
 
-    val logOutput = SystemCommands.runFullCommand(loggerArguments)(jsonLogger)
-    val entries: List[LogEntry] = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
+    val jsonLogger = new JsonLogger(repoDir)
+    val entries = jsonLogger.repoLogs()
     RepoData(entries)
   }
 }
@@ -153,13 +154,8 @@ class GitDataFileCreator(
   }
 }
 
-
 object GitManager {
-
   val home = "/home/bfrasure/"
-  val git = Seq("git")
-  val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
-
 
   def actorTest(): Unit = {
     val system = ActorSystem("helloakka")
@@ -177,20 +173,19 @@ object GitManager {
     println
   }
 
+
+
   def main(args: Array[String]) = 
   {
     actorTest()
+
     val email = args(0)
     val gitRepo = args(1)
-
     val repoDir= home + gitRepo + "/"
-    val loggerArguments = Seq(repoDir)
 
-    val logOutput = SystemCommands.runFullCommand(loggerArguments)(jsonLogger)
+    val jsonLogger = new JsonLogger(repoDir)
 
-    //println("logOutput: " + logOutput)
-
-    val entries: List[LogEntry] = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
+    val entries = jsonLogger.repoLogs()
 
     val userEntries = entries.filter(_.author contains email )
 
@@ -204,7 +199,7 @@ object GitManager {
     dataFileCreator.writeDataFile(commitDeltas)
 
     val plotter = new GnuPlotter
-    val plotScriptName = gitRepo.replaceAll("/","_").init
+    val plotScriptName = dataFileCreator.repoFileName
     val plotScriptData = List(plotter.createPlotScript(plotScriptName))
 
     dataFileCreator.writePlotScript(plotScriptData)
