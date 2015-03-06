@@ -12,6 +12,9 @@ import com.billding.DataWriter
 
 import argonaut._, Argonaut._
 
+import akka.actor.{ ActorLogging, ActorRef, ActorSystem, Props, Actor, Inbox }
+import scala.concurrent.duration._
+
 case class LogEntry(commit: String, author: String, date: Option[String], message: Option[String])
 
 object LogEntry {
@@ -31,8 +34,20 @@ class JsonLogger(repoDir:String) {
 }
 
 case class GitHash( hash: String)
+case class HashList( hashes: List[GitHash] )
 
-class CommitParser(repoDir:String) {
+object CommitParser {
+  def props(repoDir: String): Props = Props(new CommitParser(repoDir))
+}
+class CommitParser(repoDir:String) extends Actor with ActorLogging{
+
+  def receive = {
+    case HashList(hashes) => {
+      sender ! createDeltas(hashes)
+    }
+    //case Greet           => sender ! RepoData(3, "projectNameA")
+  }
+
 
   implicit val program = Seq("git")
   val gitDirectoryArguments = Seq("--git-dir=" + repoDir + ".git", "--work-tree=" + repoDir)
@@ -95,8 +110,6 @@ object CommitDelta {
   implicit def multiStringifier(cds: List[CommitDelta]): List[String] = cds map { cd => cd.toString }
 }
 
-import akka.actor.{ ActorLogging, ActorRef, ActorSystem, Props, Actor, Inbox }
-import scala.concurrent.duration._
 
 case class RepoToExamine(url: String)
 
@@ -192,6 +205,8 @@ object GitManager {
     val gitRepo = args(1)
     val repoDir= home + gitRepo + "/"
 
+    val system = ActorSystem("helloakka")
+
     val jsonLogger = new JsonLogger(repoDir)
 
     val entries = jsonLogger.repoLogs()
@@ -200,11 +215,18 @@ object GitManager {
 
     val userHashes = userEntries.map(x=>GitHash(x.commit))
 
-    val commitParser = new CommitParser(repoDir)
+    //val commitParser = new CommitParser(repoDir)
+    val commitParser = system.actorOf(CommitParser.props(repoDir), "commitParser")
 
-    val commitDeltas: List[CommitDelta] = commitParser.createDeltas(userHashes)
+    import akka.util.Timeout
+    import scala.concurrent.duration._
+    import scala.concurrent.Await
+    import akka.pattern.ask
+    implicit val timeout = Timeout(5 seconds)
+    //commitParser ! HashList(userHashes)
+    val future = commitParser ? HashList(userHashes)
+    val commitDeltas: List[CommitDelta] = Await.result(future, timeout.duration).asInstanceOf[List[CommitDelta]]
 
-    val system = ActorSystem("helloakka")
     val dataFileCreator = system.actorOf(GitDataFileCreator.props(gitRepo), "dataFileCreator")
 
     dataFileCreator ! DataFileData(commitDeltas)
