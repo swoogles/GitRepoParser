@@ -15,6 +15,11 @@ import argonaut._, Argonaut._
 import akka.actor.{ ActorLogging, ActorRef, ActorSystem, Props, Actor, Inbox }
 import scala.concurrent.duration._
 
+import akka.util.Timeout
+import scala.concurrent.duration._
+import scala.concurrent.Await
+import akka.pattern.ask
+
 case class LogEntry(commit: String, author: String, date: Option[String], message: Option[String])
 
 object LogEntry {
@@ -176,6 +181,48 @@ class GitDataFileCreator(
   }
 }
 
+case class RepoTarget(gitRepo: String, email: String)
+
+
+object GitDispatcher {
+  def props(system: ActorSystem): Props = Props(new GitDispatcher(system))
+}
+class GitDispatcher(system: ActorSystem) extends Actor with ActorLogging {
+  val home = "/home/bfrasure/"
+  def receive = {
+    case RepoTarget(gitRepo, email) => {
+      val repoFileName: String = gitRepo.replaceAll("/","_").init
+      val repoDir= home + gitRepo + "/"
+      val jsonLogger = new JsonLogger(repoDir)
+
+      val entries = jsonLogger.repoLogs()
+
+      val userEntries = entries.filter(_.author contains email )
+
+      val userHashes = userEntries.map(x=>GitHash(x.commit))
+
+      //val commitParser = new CommitParser(repoDir)
+      val commitParser = system.actorOf(CommitParser.props(repoDir), repoFileName + "commitParser")
+
+      implicit val timeout = Timeout(5 seconds)
+      //commitParser ! HashList(userHashes)
+      val future = commitParser ? HashList(userHashes)
+      val commitDeltas: List[CommitDelta] = Await.result(future, timeout.duration).asInstanceOf[List[CommitDelta]]
+
+      val dataFileCreator = system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "dataFileCreator")
+
+      dataFileCreator ! DataFileData(commitDeltas)
+
+      val plotter = new GnuPlotter
+      val plotScriptName = repoFileName
+      val plotScriptData = List(plotter.createPlotScript(plotScriptName))
+
+      dataFileCreator ! PlotScriptData(plotScriptData)
+      println("Damn!")
+    }
+  }
+}
+
 object GitManager {
   val home = "/home/bfrasure/"
 
@@ -206,39 +253,14 @@ object GitManager {
     val repoDir= home + gitRepo + "/"
 
     val system = ActorSystem("helloakka")
+    val dispatcher = system.actorOf(GitDispatcher.props(system), "dispatcher")
+    val repoTarget = RepoTarget(gitRepo, email)
+    dispatcher ! repoTarget
 
-    val jsonLogger = new JsonLogger(repoDir)
+    val repoTargetB = RepoTarget("Repositories/Personal", email)
+    dispatcher ! repoTargetB
 
-    val entries = jsonLogger.repoLogs()
-
-    val userEntries = entries.filter(_.author contains email )
-
-    val userHashes = userEntries.map(x=>GitHash(x.commit))
-
-    //val commitParser = new CommitParser(repoDir)
-    val commitParser = system.actorOf(CommitParser.props(repoDir), "commitParser")
-
-    import akka.util.Timeout
-    import scala.concurrent.duration._
-    import scala.concurrent.Await
-    import akka.pattern.ask
-    implicit val timeout = Timeout(5 seconds)
-    //commitParser ! HashList(userHashes)
-    val future = commitParser ? HashList(userHashes)
-    val commitDeltas: List[CommitDelta] = Await.result(future, timeout.duration).asInstanceOf[List[CommitDelta]]
-
-    val dataFileCreator = system.actorOf(GitDataFileCreator.props(gitRepo), "dataFileCreator")
-
-    dataFileCreator ! DataFileData(commitDeltas)
-
-    val repoFileName: String = gitRepo.replaceAll("/","_").init
-    val plotter = new GnuPlotter
-    val plotScriptName = repoFileName
-    val plotScriptData = List(plotter.createPlotScript(plotScriptName))
-
-    dataFileCreator ! PlotScriptData(plotScriptData)
-
-    Thread.sleep(1000)
+    Thread.sleep(4000)
     system.shutdown
     println
   }
