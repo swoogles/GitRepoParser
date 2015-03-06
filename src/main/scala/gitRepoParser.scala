@@ -201,7 +201,6 @@ class GitDispatcher(system: ActorSystem) extends Actor with ActorLogging {
 
       val userHashes = userEntries.map(x=>GitHash(x.commit))
 
-      //val commitParser = new CommitParser(repoDir)
       val commitParser = system.actorOf(CommitParser.props(repoDir), repoFileName + "commitParser")
 
       implicit val timeout = Timeout(5 seconds)
@@ -226,28 +225,8 @@ class GitDispatcher(system: ActorSystem) extends Actor with ActorLogging {
 object GitManager {
   val home = "/home/bfrasure/"
 
-  def actorTest(): Unit = {
-    val system = ActorSystem("helloakka")
-
-    val targetRepo = RepoToExamine("Repositories/ClashOfClans/")
-    val parser = system.actorOf(Props[ParserActor], "parser")
-    val examiner = system.actorOf(Props[RepoExaminer], "examiner")
-
-    examiner.tell(targetRepo, parser)
-
-    //system.stop
-    //system.awaitTermination()
-    Thread.sleep(1000)
-    system.shutdown
-    println
-  }
-
-
-
   def main(args: Array[String]) = 
   {
-    actorTest()
-
     val email = args(0)
     val gitRepo = args(1)
     val repoDir= home + gitRepo + "/"
