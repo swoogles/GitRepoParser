@@ -231,15 +231,30 @@ object GitManager {
     val gitRepo = args(1)
     val repoDir= home + gitRepo + "/"
 
+    val repos = List(
+      "AudioHand/",
+      "ClashOfClans/",
+      "GitRepoParser/",
+      "Latex/"
+    )
+    val qualifiedRepos = repos.map { "Repositories/" + _ }
+
     val system = ActorSystem("helloakka")
     val dispatcher = system.actorOf(GitDispatcher.props(system), "dispatcher")
-    val repoTarget = RepoTarget(gitRepo, email)
-    dispatcher ! repoTarget
+    val repoTargetA = RepoTarget(gitRepo, email)
+    dispatcher ! repoTargetA
 
     val repoTargetB = RepoTarget("Repositories/Personal", email)
     dispatcher ! repoTargetB
 
-    Thread.sleep(4000)
+    for {
+      repo <- qualifiedRepos
+    } {
+      val repoTarget = RepoTarget(repo, email)
+      dispatcher ! repoTarget
+    }
+
+    Thread.sleep(8000)
     system.shutdown
     println
   }
