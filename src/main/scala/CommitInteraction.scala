@@ -18,7 +18,7 @@ class CommitParser(gitRepo:String) extends Actor with ActorLogging{
 
   implicit val program = Seq("git")
   val home = "/home/bfrasure/"
-  val repoDir= gitRepo + "/"
+  val repoDir= home + gitRepo + "/"
   val gitDirectoryArguments = Seq("--git-dir=" + repoDir + ".git", "--work-tree=" + repoDir)
 
   def getFirstNum(wordsString:String):Int = {

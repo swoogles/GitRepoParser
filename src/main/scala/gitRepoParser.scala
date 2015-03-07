@@ -17,12 +17,11 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       val repoFileName: String = gitRepo.replaceAll("/","_").init
       val dataForWriting = DataFile(gitRepo, data)
       val dataFileCreator = context.system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "dataFileCreator")
-      println("Please be hitting this?")
       dataFileCreator ! dataForWriting
     }
 
     case FileWritten => {
-      context.system.stop(sender)
+      //context.system.stop(sender)
       filesToWrite -= 1
       println("filesToWrite left: " + filesToWrite)
       if ( filesToWrite == 0 ) {
@@ -42,12 +41,10 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
 
       val userHashes = userEntries.map(x=>GitHash(x.commit))
 
-      val commitParser = context.system.actorOf(CommitParser.props(repoDir), repoFileName + "commitParser")
+      val commitParser = context.system.actorOf(CommitParser.props(gitRepo), repoFileName + "commitParser")
 
       implicit val timeout = Timeout(5 seconds)
       //commitParser ! HashList(userHashes)
-
-      val dataFileCreator = context.system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "dataFileCreator")
 
       val plotFileCreator = context.system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "plotFileCreator")
 
@@ -61,7 +58,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       val plotScriptData = List(plotter.createPlotScript(plotScriptName))
 
       plotFileCreator ! PlotScript(plotScriptData)
-      println("Damn!")
+      println("Finished Working!")
     }
   }
 }
@@ -76,10 +73,10 @@ object GitManager {
     val repos = List(
       "AudioHand/Mixer/",
       "ClashOfClans/",
-      "GitRepoParser/"
-      //"Latex/",
-      //"Personal",
-      //"Physics"
+      "GitRepoParser/",
+      "Latex/",
+      "Personal",
+      "Physics"
     )
     val qualifiedRepos = repos.map { "Repositories/" + _ }
 
