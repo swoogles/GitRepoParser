@@ -44,14 +44,16 @@ case class HashList( hashes: List[GitHash] )
 object CommitParser {
   def props(repoDir: String): Props = Props(new CommitParser(repoDir))
 }
-class CommitParser(repoDir:String) extends Actor with ActorLogging{
+class CommitParser(gitRepo:String) extends Actor with ActorLogging{
   def receive = {
     case HashList(hashes) => {
-      sender ! DataFile(createDeltas(hashes))
+      sender ! DataFile(gitRepo, createDeltas(hashes))
     }
   }
 
   implicit val program = Seq("git")
+  val home = "/home/bfrasure/"
+  val repoDir= gitRepo + "/"
   val gitDirectoryArguments = Seq("--git-dir=" + repoDir + ".git", "--work-tree=" + repoDir)
 
   def getFirstNum(wordsString:String):Int = {
@@ -113,7 +115,7 @@ object CommitDelta {
 }
 
 case class PlotScript(data:List[String])
-case class DataFile(data:List[String])
+case class DataFile(gitRepo: String, data:List[String])
 
 object GitDataFileCreator {
   def props(gitRepo: String): Props = Props(new GitDataFileCreator(gitRepo))
@@ -123,7 +125,7 @@ class GitDataFileCreator(
 ) extends Actor with ActorLogging
 {
   def receive = {
-    case DataFile(data) => {
+    case DataFile(gitRepo, data) => {
       writeDataFile(data)
       context.system.stop(sender)
     }
@@ -159,7 +161,16 @@ object GitDispatcher {
 class GitDispatcher(var numRepos: Int) extends Actor with ActorLogging {
   val home = "/home/bfrasure/"
   def receive = {
-    case CommitParsed => { context.system.stop(sender) }
+    case DataFile(gitRepo, data) => {
+      val repoFileName: String = gitRepo.replaceAll("/","_").init
+      val dataForWriting = DataFile(gitRepo, data)
+      val dataFileCreator = context.system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "dataFileCreator")
+      dataFileCreator ! dataForWriting
+    }
+
+    case CommitParsed => { 
+    context.system.stop(sender) 
+    }
     case FileWritten => {
       context.system.stop(sender)
       numRepos -= 1
