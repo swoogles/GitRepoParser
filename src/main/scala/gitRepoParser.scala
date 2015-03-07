@@ -48,7 +48,7 @@ class CommitParser(repoDir:String) extends Actor with ActorLogging{
 
   def receive = {
     case HashList(hashes) => {
-      sender ! createDeltas(hashes)
+      sender ! DataFileData(createDeltas(hashes))
     }
     //case Greet           => sender ! RepoData(3, "projectNameA")
   }
@@ -163,7 +163,10 @@ class GitDataFileCreator(
   def receive = {
     case RepoData(entries) => println("first entry: " + entries.head)
     case PlotScriptData(data) => writePlotScript(data)
-    case DataFileData(data) => writeDataFile(data)
+    case DataFileData(data) => {
+      println("writing data file")
+      writeDataFile(data)
+    }
   }
 
   val repoFileName: String = gitRepo.replaceAll("/","_").init
@@ -206,12 +209,13 @@ class GitDispatcher(system: ActorSystem) extends Actor with ActorLogging {
 
       implicit val timeout = Timeout(5 seconds)
       //commitParser ! HashList(userHashes)
-      val future = commitParser ? HashList(userHashes)
-      val commitDeltas: List[CommitDelta] = Await.result(future, timeout.duration).asInstanceOf[List[CommitDelta]]
 
       val dataFileCreator = system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "dataFileCreator")
 
-      dataFileCreator ! DataFileData(commitDeltas)
+      // After parser does its work, it should tell the results to dataFileCreator
+      // I'm sure there's a more proper way where dataFileCreator is already the
+      // sender, but this will have to do for now.
+      commitParser.tell(HashList(userHashes), dataFileCreator)
 
       val plotter = new GnuPlotter
       val plotScriptName = repoFileName
@@ -233,10 +237,10 @@ object GitManager {
     val repos = List(
       "AudioHand/Mixer",
       "ClashOfClans/",
-      "GitRepoParser/",
-      "Latex/",
-      "Personal",
-      "Physics"
+      "GitRepoParser/"
+      //"Latex/",
+      //"Personal",
+      //"Physics"
     )
     val qualifiedRepos = repos.map { "Repositories/" + _ }
 
