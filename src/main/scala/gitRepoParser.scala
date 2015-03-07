@@ -45,14 +45,11 @@ object CommitParser {
   def props(repoDir: String): Props = Props(new CommitParser(repoDir))
 }
 class CommitParser(repoDir:String) extends Actor with ActorLogging{
-
   def receive = {
     case HashList(hashes) => {
       sender ! DataFile(createDeltas(hashes))
     }
-    //case Greet           => sender ! RepoData(3, "projectNameA")
   }
-
 
   implicit val program = Seq("git")
   val gitDirectoryArguments = Seq("--git-dir=" + repoDir + ".git", "--work-tree=" + repoDir)
@@ -115,41 +112,6 @@ object CommitDelta {
   implicit def multiStringifier(cds: List[CommitDelta]): List[String] = cds map { cd => cd.toString }
 }
 
-
-case class RepoToExamine(url: String)
-
-class RepoExaminer extends Actor with ActorLogging{
-  val home = "/home/bfrasure/"
-  val git = Seq("git")
-  val jsonLogger = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
-
-  def receive = {
-    case RepoToExamine(url) => {
-      sender ! retrieveRepoData(url)
-    }
-    //case Greet           => sender ! RepoData(3, "projectNameA")
-  }
-
-  def retrieveRepoData(gitRepo: String): RepoData = {
-    val repoDir= home + gitRepo
-
-    val jsonLogger = new JsonLogger(repoDir)
-    val entries = jsonLogger.repoLogs()
-    RepoData(entries)
-  }
-}
-
-case class RepoData(entries: List[LogEntry])
-
-class ParserActor extends Actor with ActorLogging{
-  def receive = {
-    case RepoData(entries) => println("first entry: " + entries.head)
-    case unknown => {
-      log.info("Unknown result: " + unknown)
-    }
-  }
-}
-
 case class PlotScript(data:List[String])
 case class DataFile(data:List[String])
 
@@ -191,12 +153,18 @@ case class RepoTarget(gitRepo: String, email: String)
 case object FileWritten
 
 object GitDispatcher {
-  def props(system: ActorSystem): Props = Props(new GitDispatcher(system))
+  def props(system: ActorSystem, numRepos: Int): Props = Props(new GitDispatcher(system, numRepos))
 }
-class GitDispatcher(system: ActorSystem) extends Actor with ActorLogging {
+class GitDispatcher(system: ActorSystem, var numRepos: Int) extends Actor with ActorLogging {
   val home = "/home/bfrasure/"
   def receive = {
-    case FileWritten => system.stop(sender)
+    case FileWritten => {
+      //system.stop(sender)
+      numRepos -= 1
+      println("numRepos left: " + numRepos)
+      if ( numRepos == 0 )
+        context.system.shutdown()
+    }
     case RepoTarget(gitRepo, email) => {
       println("Let's get to work!")
       val repoFileName: String = gitRepo.replaceAll("/","_").init
@@ -241,7 +209,7 @@ object GitManager {
     val email = args(0)
 
     val repos = List(
-      "AudioHand/Mixer",
+      "AudioHand/Mixer/",
       "ClashOfClans/",
       "GitRepoParser/"
       //"Latex/",
@@ -251,7 +219,7 @@ object GitManager {
     val qualifiedRepos = repos.map { "Repositories/" + _ }
 
     val system = ActorSystem("helloakka")
-    val dispatcher = system.actorOf(GitDispatcher.props(system), "dispatcher")
+    val dispatcher = system.actorOf(GitDispatcher.props(system, repos.size), "dispatcher")
 
     for {
       repo <- qualifiedRepos
@@ -262,7 +230,7 @@ object GitManager {
     }
 
     Thread.sleep(8000)
-    system.shutdown
+    //system.shutdown
 
     GnuPlotter.executePlotScripts()
     println
