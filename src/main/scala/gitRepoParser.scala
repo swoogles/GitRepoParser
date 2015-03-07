@@ -154,14 +154,14 @@ case object CommitParsed
 case object FileWritten
 
 object GitDispatcher {
-  def props(system: ActorSystem, numRepos: Int): Props = Props(new GitDispatcher(system, numRepos))
+  def props(numRepos: Int): Props = Props(new GitDispatcher(numRepos))
 }
-class GitDispatcher(system: ActorSystem, var numRepos: Int) extends Actor with ActorLogging {
+class GitDispatcher(var numRepos: Int) extends Actor with ActorLogging {
   val home = "/home/bfrasure/"
   def receive = {
-    case CommitParsed => { system.stop(sender) }
+    case CommitParsed => { context.system.stop(sender) }
     case FileWritten => {
-      system.stop(sender)
+      context.system.stop(sender)
       numRepos -= 1
       println("numRepos left: " + numRepos)
       if ( numRepos == 0 )
@@ -179,14 +179,14 @@ class GitDispatcher(system: ActorSystem, var numRepos: Int) extends Actor with A
 
       val userHashes = userEntries.map(x=>GitHash(x.commit))
 
-      val commitParser = system.actorOf(CommitParser.props(repoDir), repoFileName + "commitParser")
+      val commitParser = context.system.actorOf(CommitParser.props(repoDir), repoFileName + "commitParser")
 
       implicit val timeout = Timeout(5 seconds)
       //commitParser ! HashList(userHashes)
 
-      val dataFileCreator = system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "dataFileCreator")
+      val dataFileCreator = context.system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "dataFileCreator")
 
-      val plotFileCreator = system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "plotFileCreator")
+      val plotFileCreator = context.system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "plotFileCreator")
 
       // After parser does its work, it should tell the results to dataFileCreator
       // I'm sure there's a more proper way where dataFileCreator is already the
@@ -221,7 +221,7 @@ object GitManager {
     val qualifiedRepos = repos.map { "Repositories/" + _ }
 
     val system = ActorSystem("helloakka")
-    val dispatcher = system.actorOf(GitDispatcher.props(system, repos.size), "dispatcher")
+    val dispatcher = system.actorOf(GitDispatcher.props(repos.size), "dispatcher")
 
     for {
       repo <- qualifiedRepos
