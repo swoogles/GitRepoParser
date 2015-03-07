@@ -125,7 +125,7 @@ class GitDataFileCreator(
   def receive = {
     case DataFile(data) => {
       writeDataFile(data)
-      sender ! FileWritten
+      context.system.stop(sender)
     }
     case PlotScript(data) => {
       writePlotScript(data)
@@ -150,6 +150,7 @@ class GitDataFileCreator(
 
 case class RepoTarget(gitRepo: String, email: String)
 
+case object CommitParsed
 case object FileWritten
 
 object GitDispatcher {
@@ -158,8 +159,9 @@ object GitDispatcher {
 class GitDispatcher(system: ActorSystem, var numRepos: Int) extends Actor with ActorLogging {
   val home = "/home/bfrasure/"
   def receive = {
+    case CommitParsed => { system.stop(sender) }
     case FileWritten => {
-      //system.stop(sender)
+      system.stop(sender)
       numRepos -= 1
       println("numRepos left: " + numRepos)
       if ( numRepos == 0 )
