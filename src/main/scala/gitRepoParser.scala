@@ -256,6 +256,8 @@ object GitManager {
 
     Thread.sleep(8000)
     system.shutdown
+
+    GnuPlotter.executePlotScripts()
     println
   }
 }

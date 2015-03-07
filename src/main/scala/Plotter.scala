@@ -12,7 +12,7 @@ case class GnuPlotter (
   def createPlotScript(project:String) = {
   val imageOutput = s"""
     set term png
-    set output "$project.png"
+    set output "images/$project.png"
   """
 
     val plotSettings = s"""
@@ -45,7 +45,13 @@ case class GnuPlotter (
 object GnuPlotter {
 
   def plotColumn(project:String, column:Int, color:String):String = {
-    "plot '../data/" + project + ".dat' using 1:" + column + " lt rgb \"" + color + "\" w line \n"
+    "plot 'data/" + project + ".dat' using 1:" + column + " lt rgb \"" + color + "\" w line \n"
+  }
+
+  implicit val program = Seq("gnuplot")
+  def executePlotScripts() = {
+    val plotScriptDir = Seq("plotfiles/*")
+    SystemCommands.runFullCommandWithWildCards(plotScriptDir)
   }
 
 }

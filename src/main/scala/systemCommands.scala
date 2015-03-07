@@ -16,5 +16,12 @@ object SystemCommands {
     //val output = fullCommand.lineStream.foreach(println)
     //"returned"
   }
+
+  // Wildcards aren't properly expanded if you try to feed them directly into 
+  // Process arguments.
+  def runFullCommandWithWildCards (arguments:Seq[String] )( implicit program:Seq[String]):String = {
+    val fullCommand = (program++arguments)
+    Process(Seq("bash", "-c", fullCommand.mkString(" "))).!!
+  }
 }
 
