@@ -191,6 +191,7 @@ class GitDispatcher(system: ActorSystem) extends Actor with ActorLogging {
   val home = "/home/bfrasure/"
   def receive = {
     case RepoTarget(gitRepo, email) => {
+      println("Let's get to work!")
       val repoFileName: String = gitRepo.replaceAll("/","_").init
       val repoDir= home + gitRepo + "/"
       val jsonLogger = new JsonLogger(repoDir)
@@ -228,24 +229,19 @@ object GitManager {
   def main(args: Array[String]) = 
   {
     val email = args(0)
-    val gitRepo = args(1)
-    val repoDir= home + gitRepo + "/"
 
     val repos = List(
       "AudioHand/Mixer",
       "ClashOfClans/",
       "GitRepoParser/",
-      "Latex/"
+      "Latex/",
+      "Personal",
+      "Physics"
     )
     val qualifiedRepos = repos.map { "Repositories/" + _ }
 
     val system = ActorSystem("helloakka")
     val dispatcher = system.actorOf(GitDispatcher.props(system), "dispatcher")
-    val repoTargetA = RepoTarget(gitRepo, email)
-    dispatcher ! repoTargetA
-
-    val repoTargetB = RepoTarget("Repositories/Personal", email)
-    dispatcher ! repoTargetB
 
     for {
       repo <- qualifiedRepos
