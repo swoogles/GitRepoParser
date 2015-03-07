@@ -8,27 +8,27 @@ import akka.util.Timeout
 
 
 object GitDispatcher {
-  def props(numRepos: Int): Props = Props(new GitDispatcher(numRepos))
+  def props(filesToWrite: Int): Props = Props(new GitDispatcher(filesToWrite))
 }
-class GitDispatcher(var numRepos: Int) extends Actor with ActorLogging {
+class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
   val home = "/home/bfrasure/"
   def receive = {
     case DataFile(gitRepo, data) => {
       val repoFileName: String = gitRepo.replaceAll("/","_").init
       val dataForWriting = DataFile(gitRepo, data)
       val dataFileCreator = context.system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "dataFileCreator")
+      println("Please be hitting this?")
       dataFileCreator ! dataForWriting
     }
 
-    case CommitParsed => { 
-    context.system.stop(sender) 
-    }
     case FileWritten => {
       context.system.stop(sender)
-      numRepos -= 1
-      println("numRepos left: " + numRepos)
-      if ( numRepos == 0 )
+      filesToWrite -= 1
+      println("filesToWrite left: " + filesToWrite)
+      if ( filesToWrite == 0 ) {
         context.system.shutdown()
+        GnuPlotter.executePlotScripts()
+      }
     }
     case RepoTarget(gitRepo, email) => {
       println("Let's get to work!")
@@ -54,7 +54,7 @@ class GitDispatcher(var numRepos: Int) extends Actor with ActorLogging {
       // After parser does its work, it should tell the results to dataFileCreator
       // I'm sure there's a more proper way where dataFileCreator is already the
       // sender, but this will have to do for now.
-      commitParser.tell(HashList(userHashes), dataFileCreator)
+      commitParser ! HashList(userHashes)
 
       val plotter = new GnuPlotter
       val plotScriptName = repoFileName
@@ -84,7 +84,10 @@ object GitManager {
     val qualifiedRepos = repos.map { "Repositories/" + _ }
 
     val system = ActorSystem("helloakka")
-    val dispatcher = system.actorOf(GitDispatcher.props(repos.size), "dispatcher")
+    val numRepos = repos.size
+    val filesPerRepo = 2
+    val filesToWrite = numRepos * filesPerRepo
+    val dispatcher = system.actorOf(GitDispatcher.props(filesToWrite), "dispatcher")
 
     for {
       repo <- qualifiedRepos
@@ -94,10 +97,10 @@ object GitManager {
       dispatcher ! repoTarget
     }
 
-    Thread.sleep(8000)
+    //Thread.sleep(8000)
     //system.shutdown
 
-    GnuPlotter.executePlotScripts()
+    //GnuPlotter.executePlotScripts()
     println
   }
 }

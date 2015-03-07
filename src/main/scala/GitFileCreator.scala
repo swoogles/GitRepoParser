@@ -17,7 +17,7 @@ class GitDataFileCreator(
   def receive = {
     case DataFile(gitRepo, data) => {
       writeDataFile(data)
-      context.system.stop(sender)
+      sender ! FileWritten
     }
     case PlotScript(data) => {
       writePlotScript(data)
@@ -42,5 +42,4 @@ class GitDataFileCreator(
 
 case class RepoTarget(gitRepo: String, email: String)
 
-case object CommitParsed
 case object FileWritten
