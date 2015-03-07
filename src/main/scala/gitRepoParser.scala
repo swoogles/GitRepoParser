@@ -48,7 +48,7 @@ class CommitParser(repoDir:String) extends Actor with ActorLogging{
 
   def receive = {
     case HashList(hashes) => {
-      sender ! DataFileData(createDeltas(hashes))
+      sender ! DataFile(createDeltas(hashes))
     }
     //case Greet           => sender ! RepoData(3, "projectNameA")
   }
@@ -150,8 +150,8 @@ class ParserActor extends Actor with ActorLogging{
   }
 }
 
-case class PlotScriptData(data:List[String])
-case class DataFileData(data:List[String])
+case class PlotScript(data:List[String])
+case class DataFile(data:List[String])
 
 object GitDataFileCreator {
   def props(gitRepo: String): Props = Props(new GitDataFileCreator(gitRepo))
@@ -161,11 +161,13 @@ class GitDataFileCreator(
 ) extends Actor with ActorLogging
 {
   def receive = {
-    case RepoData(entries) => println("first entry: " + entries.head)
-    case PlotScriptData(data) => writePlotScript(data)
-    case DataFileData(data) => {
-      println("writing data file")
+    case DataFile(data) => {
       writeDataFile(data)
+      sender ! FileWritten
+    }
+    case PlotScript(data) => {
+      writePlotScript(data)
+      sender ! FileWritten
     }
   }
 
@@ -186,6 +188,7 @@ class GitDataFileCreator(
 
 case class RepoTarget(gitRepo: String, email: String)
 
+case object FileWritten
 
 object GitDispatcher {
   def props(system: ActorSystem): Props = Props(new GitDispatcher(system))
@@ -193,6 +196,7 @@ object GitDispatcher {
 class GitDispatcher(system: ActorSystem) extends Actor with ActorLogging {
   val home = "/home/bfrasure/"
   def receive = {
+    case FileWritten => system.stop(sender)
     case RepoTarget(gitRepo, email) => {
       println("Let's get to work!")
       val repoFileName: String = gitRepo.replaceAll("/","_").init
@@ -212,6 +216,8 @@ class GitDispatcher(system: ActorSystem) extends Actor with ActorLogging {
 
       val dataFileCreator = system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "dataFileCreator")
 
+      val plotFileCreator = system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "plotFileCreator")
+
       // After parser does its work, it should tell the results to dataFileCreator
       // I'm sure there's a more proper way where dataFileCreator is already the
       // sender, but this will have to do for now.
@@ -221,7 +227,7 @@ class GitDispatcher(system: ActorSystem) extends Actor with ActorLogging {
       val plotScriptName = repoFileName
       val plotScriptData = List(plotter.createPlotScript(plotScriptName))
 
-      dataFileCreator ! PlotScriptData(plotScriptData)
+      plotFileCreator ! PlotScript(plotScriptData)
       println("Damn!")
     }
   }
@@ -251,6 +257,7 @@ object GitManager {
       repo <- qualifiedRepos
     } {
       val repoTarget = RepoTarget(repo, email)
+      println("About to dispatch")
       dispatcher ! repoTarget
     }
 
