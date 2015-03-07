@@ -1,11 +1,3 @@
-import scala.sys.process._
-import scala.sys.process.Process
-
-import util.matching.Regex
-
-import scala.sys.process._
-import scala.sys.process.Process
-import com.billding.SystemCommands
 import com.billding.GnuPlotter
 import com.billding.Utility
 import com.billding.DataWriter
@@ -14,9 +6,6 @@ import akka.actor.{ ActorLogging, ActorRef, ActorSystem, Props, Actor, Inbox }
 import scala.concurrent.duration._
 
 import akka.util.Timeout
-import scala.concurrent.duration._
-import scala.concurrent.Await
-import akka.pattern.ask
 
 
 case class PlotScript(data:List[String])
