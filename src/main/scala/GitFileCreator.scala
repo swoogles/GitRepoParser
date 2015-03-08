@@ -2,7 +2,7 @@
 import com.billding.Utility
 import com.billding.DataWriter
 
-import akka.actor.{ ActorLogging, ActorRef, ActorSystem, Props, Actor, Inbox }
+import akka.actor.{ ActorLogging, Props, Actor }
 
 case class PlotScript(data:List[String])
 case class DataFile(gitRepo: GitRepo, data:List[String])
@@ -25,17 +25,16 @@ class GitDataFileCreator(
     }
   }
 
-  val repoFileName: String = gitRepo.fileName
   val dataWriter: DataWriter = new DataWriter
   val utility: Utility = new Utility
 
   def writePlotScript(data:List[String]) = {
-    val plotScriptName = "plotfiles/" + repoFileName + ".gnuplot"
+    val plotScriptName = "plotfiles/" + gitRepo.fileName + ".gnuplot"
     dataWriter.write(data, plotScriptName, utility)
   }
 
   def writeDataFile(data:List[String]) = {
-    val dataFileName = "data/" + repoFileName +".dat" 
+    val dataFileName = "data/" + gitRepo.fileName +".dat" 
     dataWriter.write(data, dataFileName, utility)
   }
 }

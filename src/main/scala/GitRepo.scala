@@ -5,7 +5,7 @@ case class GitRepo(path: Path, home: Path) {
   def fileName(): String = {
     path.toString.replaceAll("/","_")
   }
-  def repoDir(): String = {
+  def dir(): String = {
     home + "/" + path.toString + "/"
   }
 }
