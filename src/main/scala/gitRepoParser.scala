@@ -34,9 +34,6 @@ object GitManager {
       dispatcher ! repoTarget
     }
 
-    //Thread.sleep(8000)
-    //system.shutdown
-
     println
   }
 }

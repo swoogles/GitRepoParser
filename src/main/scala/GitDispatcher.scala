@@ -11,14 +11,11 @@ object GitDispatcher {
 class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
   val home = "/home/bfrasure/"
   def receive = {
-    //case DataFile(gitRepo, data) => {
     case dataFile: DataFile => {
       val repoFileName: String = dataFile.gitRepo.replaceAll("/","_").init
       val dataFileCreator = context.system.actorOf(GitDataFileCreator.props(dataFile.gitRepo), repoFileName + "dataFileCreator")
 
-      //val dataForWriting = DataFile(gitRepo, data)
       dataFileCreator ! dataFile
-      //dataFileCreator forward message
     }
 
     case FileWritten => {
