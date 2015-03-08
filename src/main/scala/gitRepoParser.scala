@@ -11,11 +11,11 @@ object GitManager {
 
     val repos = List(
       "AtomicScala",
-      "AudioHand/Mixer",
-      "ClashOfClans",
+      "AudioHand/Mixer/",
+      "ClashOfClans/",
       "ConcurrencyInAction",
-      "GitRepoParser",
-      "Latex",
+      "GitRepoParser/",
+      "Latex/",
       "Personal",
       "Physics",
       "ProjectEuler",
