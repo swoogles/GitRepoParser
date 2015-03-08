@@ -1,13 +1,5 @@
 import akka.actor.{ ActorSystem, Actor}
 
-case class GitRepo(path: String, home: String) {
-  def fileName(): String = {
-    path.replaceAll("/","_")
-  }
-  def repoDir(): String = {
-    home + path + "/"
-  }
-}
 case class RepoTarget(gitRepo: GitRepo, email: String)
 
 object GitManager {
