@@ -13,7 +13,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
   def receive = {
     case dataFile: DataFile => {
       val repoFileName: String = dataFile.gitRepo.replaceAll("/","_").init
-      val dataFileCreator = context.system.actorOf(GitDataFileCreator.props(dataFile.gitRepo), repoFileName + "dataFileCreator")
+      val dataFileCreator = context.actorOf(GitDataFileCreator.props(dataFile.gitRepo), repoFileName + "dataFileCreator")
 
       dataFileCreator ! dataFile
     }
@@ -39,12 +39,11 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
 
       val userHashes = userEntries.map(x=>GitHash(x.commit))
 
-      val commitParser = context.system.actorOf(CommitParser.props(gitRepo), repoFileName + "commitParser")
+      val commitParser = context.actorOf(CommitParser.props(gitRepo), repoFileName + "commitParser")
 
       implicit val timeout = Timeout(5 seconds)
-      //commitParser ! HashList(userHashes)
 
-      val plotFileCreator = context.system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "plotFileCreator")
+      val plotFileCreator = context.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "plotFileCreator")
 
       // After parser does its work, it should tell the results to dataFileCreator
       // I'm sure there's a more proper way where dataFileCreator is already the
