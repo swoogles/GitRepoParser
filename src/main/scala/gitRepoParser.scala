@@ -13,15 +13,18 @@ object GitDispatcher {
 class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
   val home = "/home/bfrasure/"
   def receive = {
-    case DataFile(gitRepo, data) => {
-      val repoFileName: String = gitRepo.replaceAll("/","_").init
-      val dataForWriting = DataFile(gitRepo, data)
-      val dataFileCreator = context.system.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "dataFileCreator")
-      dataFileCreator ! dataForWriting
+    //case DataFile(gitRepo, data) => {
+    case dataFile: DataFile => {
+      val repoFileName: String = dataFile.gitRepo.replaceAll("/","_").init
+      val dataFileCreator = context.system.actorOf(GitDataFileCreator.props(dataFile.gitRepo), repoFileName + "dataFileCreator")
+
+      //val dataForWriting = DataFile(gitRepo, data)
+      dataFileCreator ! dataFile
+      //dataFileCreator forward message
     }
 
     case FileWritten => {
-      //context.system.stop(sender)
+      //context.system.stop(sender) //TODO call this without errors
       filesToWrite -= 1
       println("filesToWrite left: " + filesToWrite)
       if ( filesToWrite == 0 ) {
@@ -30,7 +33,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       }
     }
     case RepoTarget(gitRepo, email) => {
-      println("Let's get to work!")
+      log.info("Let's get to work!")
       val repoFileName: String = gitRepo.replaceAll("/","_").init
       val repoDir= home + gitRepo + "/"
       val jsonLogger = new JsonLogger(repoDir)
@@ -58,7 +61,6 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       val plotScriptData = List(plotter.createPlotScript(plotScriptName))
 
       plotFileCreator ! PlotScript(plotScriptData)
-      println("Finished Working!")
     }
   }
 }
@@ -71,12 +73,16 @@ object GitManager {
     val email = args(0)
 
     val repos = List(
+      "AtomicScala",
       "AudioHand/Mixer/",
       "ClashOfClans/",
+      "ConcurrencyInAction",
       "GitRepoParser/",
       "Latex/",
       "Personal",
-      "Physics"
+      "Physics",
+      "ProjectEuler",
+      "RoundToNearestX"
     )
     val qualifiedRepos = repos.map { "Repositories/" + _ }
 
@@ -90,7 +96,6 @@ object GitManager {
       repo <- qualifiedRepos
     } {
       val repoTarget = RepoTarget(repo, email)
-      println("About to dispatch")
       dispatcher ! repoTarget
     }
 
