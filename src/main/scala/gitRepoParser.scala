@@ -2,7 +2,7 @@ import akka.actor.{ ActorSystem, Actor}
 
 case class GitRepo(path: String, home: String) {
   def fileName(): String = {
-    path.replaceAll("/","_").init
+    path.replaceAll("/","_")
   }
   def repoDir(): String = {
     home + path + "/"
@@ -19,11 +19,11 @@ object GitManager {
 
     val repos = List(
       "AtomicScala",
-      "AudioHand/Mixer/",
-      "ClashOfClans/",
+      "AudioHand/Mixer",
+      "ClashOfClans",
       "ConcurrencyInAction",
-      "GitRepoParser/",
-      "Latex/",
+      "GitRepoParser",
+      "Latex",
       "Personal",
       "Physics",
       "ProjectEuler",
