@@ -1,9 +1,16 @@
+import java.nio.file.Path
+import java.nio.file.Paths
 
-case class GitRepo(path: String, home: String) {
+case class GitRepo(path: Path, home: Path) {
   def fileName(): String = {
-    path.replaceAll("/","_")
+    path.toString.replaceAll("/","_")
   }
   def repoDir(): String = {
-    home + path + "/"
+    home + "/" + path.toString + "/"
+  }
+}
+object GitRepo {
+  def apply(pathString: String, homeString: String) = {
+    new GitRepo( Paths.get(pathString), Paths.get(homeString))
   }
 }

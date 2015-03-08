@@ -40,6 +40,7 @@ object GitManager {
       dispatcher ! repoTarget
     }
 
-    println
+    val gitRepoB = GitRepo( "Repos/Diddly/Squat", "/home/billybob")
+    println("gitRepoB: " + gitRepoB.path.getClass)
   }
 }
