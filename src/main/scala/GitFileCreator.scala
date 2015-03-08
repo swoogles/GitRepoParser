@@ -35,7 +35,6 @@ class GitDataFileCreator(
   }
 
   def writeDataFile(data:List[String]) = {
-    println("repoFileName: " + repoFileName)
     val dataFileName = "data/" + repoFileName +".dat" 
     dataWriter.write(data, dataFileName, utility)
   }
