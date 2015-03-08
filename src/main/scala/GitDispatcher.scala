@@ -12,7 +12,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
   val home = "/home/bfrasure/"
   def receive = {
     case dataFile: DataFile => {
-      val repoFileName: String = dataFile.gitRepo.replaceAll("/","_").init
+      val repoFileName: String = dataFile.gitRepo.fileName
       val dataFileCreator = context.actorOf(GitDataFileCreator.props(dataFile.gitRepo), repoFileName + "dataFileCreator")
 
       dataFileCreator ! dataFile
@@ -29,9 +29,9 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
     }
     case RepoTarget(gitRepo, email) => {
       log.info("Let's get to work!")
-      val repoFileName: String = gitRepo.replaceAll("/","_").init
+      val repoFileName: String = gitRepo.fileName
       val repoDir= home + gitRepo + "/"
-      val jsonLogger = new JsonLogger(repoDir)
+      val jsonLogger = new JsonLogger(gitRepo.repoDir)
 
       val entries = jsonLogger.repoLogs()
 

@@ -5,13 +5,13 @@ import com.billding.DataWriter
 import akka.actor.{ ActorLogging, ActorRef, ActorSystem, Props, Actor, Inbox }
 
 case class PlotScript(data:List[String])
-case class DataFile(gitRepo: String, data:List[String])
+case class DataFile(gitRepo: GitRepo, data:List[String])
 
 object GitDataFileCreator {
-  def props(gitRepo: String): Props = Props(new GitDataFileCreator(gitRepo))
+  def props(gitRepo: GitRepo): Props = Props(new GitDataFileCreator(gitRepo))
 }
 class GitDataFileCreator(
-  gitRepo: String
+  gitRepo: GitRepo
 ) extends Actor with ActorLogging
 {
   def receive = {
@@ -25,7 +25,7 @@ class GitDataFileCreator(
     }
   }
 
-  val repoFileName: String = gitRepo.replaceAll("/","_").init
+  val repoFileName: String = gitRepo.fileName
   val dataWriter: DataWriter = new DataWriter
   val utility: Utility = new Utility
 
@@ -39,7 +39,5 @@ class GitDataFileCreator(
     dataWriter.write(data, dataFileName, utility)
   }
 }
-
-case class RepoTarget(gitRepo: String, email: String)
 
 case object FileWritten

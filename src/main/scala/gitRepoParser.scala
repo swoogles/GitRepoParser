@@ -1,5 +1,15 @@
 import akka.actor.{ ActorSystem, Actor}
 
+case class GitRepo(path: String, home: String) {
+  def fileName(): String = {
+    path.replaceAll("/","_").init
+  }
+  def repoDir(): String = {
+    home + path + "/"
+  }
+}
+case class RepoTarget(gitRepo: GitRepo, email: String)
+
 object GitManager {
   val home = "/home/bfrasure/"
 
@@ -21,6 +31,10 @@ object GitManager {
     )
     val qualifiedRepos = repos.map { "Repositories/" + _ }
 
+    val gitRepos: List[GitRepo] = qualifiedRepos.map { x=>
+      GitRepo(x, home)
+    }
+
     val system = ActorSystem("helloakka")
     val numRepos = repos.size
     val filesPerRepo = 2
@@ -28,7 +42,7 @@ object GitManager {
     val dispatcher = system.actorOf(GitDispatcher.props(filesToWrite), "dispatcher")
 
     for {
-      repo <- qualifiedRepos
+      repo <- gitRepos
     } {
       val repoTarget = RepoTarget(repo, email)
       dispatcher ! repoTarget

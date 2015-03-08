@@ -7,9 +7,9 @@ case class GitHash( hash: String)
 case class HashList( hashes: List[GitHash] )
 
 object CommitParser {
-  def props(repoDir: String): Props = Props(new CommitParser(repoDir))
+  def props(gitRepo: GitRepo): Props = Props(new CommitParser(gitRepo))
 }
-class CommitParser(gitRepo:String) extends Actor with ActorLogging{
+class CommitParser(gitRepo: GitRepo) extends Actor with ActorLogging{
   def receive = {
     case HashList(hashes) => {
       sender ! DataFile(gitRepo, createDeltas(hashes))
@@ -17,8 +17,7 @@ class CommitParser(gitRepo:String) extends Actor with ActorLogging{
   }
 
   implicit val program = Seq("git")
-  val home = "/home/bfrasure/"
-  val repoDir= home + gitRepo + "/"
+  val repoDir= gitRepo.repoDir
   val gitDirectoryArguments = Seq("--git-dir=" + repoDir + ".git", "--work-tree=" + repoDir)
 
   def getFirstNum(wordsString:String):Int = {
