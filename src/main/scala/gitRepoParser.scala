@@ -30,7 +30,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       }
     }
     case RepoTarget(gitRepo, email) => {
-      println("Let's get to work!")
+      log.info("Let's get to work!")
       val repoFileName: String = gitRepo.replaceAll("/","_").init
       val repoDir= home + gitRepo + "/"
       val jsonLogger = new JsonLogger(repoDir)
@@ -58,7 +58,6 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       val plotScriptData = List(plotter.createPlotScript(plotScriptName))
 
       plotFileCreator ! PlotScript(plotScriptData)
-      println("Finished Working!")
     }
   }
 }
@@ -71,12 +70,16 @@ object GitManager {
     val email = args(0)
 
     val repos = List(
+      "AtomicScala",
       "AudioHand/Mixer/",
       "ClashOfClans/",
+      "ConcurrencyInAction",
       "GitRepoParser/",
       "Latex/",
       "Personal",
-      "Physics"
+      "Physics",
+      "ProjectEuler",
+      "RoundToNearestX"
     )
     val qualifiedRepos = repos.map { "Repositories/" + _ }
 
@@ -90,7 +93,6 @@ object GitManager {
       repo <- qualifiedRepos
     } {
       val repoTarget = RepoTarget(repo, email)
-      println("About to dispatch")
       dispatcher ! repoTarget
     }
 
