@@ -7,14 +7,11 @@ import scala.sys.process.ProcessBuilder
 object SystemCommands {
   def runFullCommand (arguments:Seq[String] )( implicit program:Seq[String]):String = {
     val fullCommand = (program++arguments)
-    //println("Command to be run: " + fullCommand)
     //Process(fullCommand).lineStream.last
     //ProcessBuilder(fullCommand).lineStream.toString
     fullCommand!!
 
     //fullCommand.run //Best version
-    //val output = fullCommand.lineStream.foreach(println)
-    //"returned"
   }
 
   // Wildcards aren't properly expanded if you try to feed them directly into 
