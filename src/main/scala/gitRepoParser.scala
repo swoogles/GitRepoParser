@@ -1,3 +1,5 @@
+package com.billding.git
+
 import akka.actor.{ ActorSystem, Actor}
 
 case class RepoTarget(gitRepo: GitRepo, email: String)

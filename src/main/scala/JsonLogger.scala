@@ -1,6 +1,7 @@
+package com.billding
+
 import argonaut._
 import  Argonaut._
-import com.billding.SystemCommands
 
 case class LogEntry(commit: String, author: String, date: Option[String], message: Option[String])
 
@@ -9,10 +10,10 @@ object LogEntry {
     casecodec4(LogEntry.apply, LogEntry.unapply)("commit", "author", "date", "message")
 }
 
-class JsonLogger(repoDir:String) {
+object JsonLogger {
   implicit val program = Seq("/home/bfrasure/Repositories/Personal/scripts/gitLogJson.sh")
 
-  def repoLogs() = {
+  def repoLogs(repoDir:String) = {
     val loggerArguments = Seq(repoDir)
     val logOutput = SystemCommands.runFullCommand(loggerArguments)
     val entries: List[LogEntry] = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)

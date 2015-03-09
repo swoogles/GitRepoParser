@@ -1,9 +1,13 @@
+package com.billding.git
+
 import com.billding.GnuPlotter
+import com.billding.JsonLogger
 import akka.actor.{ ActorLogging, ActorRef, ActorSystem, Props, Actor }
 
 import scala.concurrent.duration._
 
 import akka.util.Timeout
+//implicit val timeout = Timeout(5 seconds) // This is just a reminder example
 
 object GitDispatcher {
   def props(filesToWrite: Int): Props = Props(new GitDispatcher(filesToWrite))
@@ -12,8 +16,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
   val home = "/home/bfrasure/"
   def receive = {
     case dataFile: DataFile => {
-      val repoFileName: String = dataFile.gitRepo.fileName
-      val dataFileCreator = context.actorOf(GitDataFileCreator.props(dataFile.gitRepo), repoFileName + "dataFileCreator")
+      val dataFileCreator = context.actorOf(GitDataFileCreator.props(dataFile.gitRepo), dataFile.gitRepo.fileName + "dataFileCreator")
 
       dataFileCreator ! dataFile
     }
@@ -30,19 +33,16 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
     case RepoTarget(gitRepo, email) => {
       log.info("Let's get to work!")
       val repoFileName: String = gitRepo.fileName
-      val jsonLogger = new JsonLogger(gitRepo.dir)
 
-      val entries = jsonLogger.repoLogs()
+      val entries = JsonLogger.repoLogs(gitRepo.dir)
 
       val userEntries = entries.filter(_.author contains email )
 
       val userHashes = userEntries.map(x=>GitHash(x.commit))
 
-      val commitParser = context.actorOf(CommitParser.props(gitRepo), repoFileName + "commitParser")
+      val commitParser = context.actorOf(CommitParser.props(gitRepo), gitRepo.fileName + "commitParser")
 
-      implicit val timeout = Timeout(5 seconds)
-
-      val plotFileCreator = context.actorOf(GitDataFileCreator.props(gitRepo), repoFileName + "plotFileCreator")
+      val plotFileCreator = context.actorOf(GitDataFileCreator.props(gitRepo), gitRepo.fileName + "plotFileCreator")
 
       // After parser does its work, it should tell the results to dataFileCreator
       // I'm sure there's a more proper way where dataFileCreator is already the
@@ -50,8 +50,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       commitParser ! HashList(userHashes)
 
       val plotter = new GnuPlotter
-      val plotScriptName = repoFileName
-      val plotScriptData = List(plotter.createPlotScript(plotScriptName))
+      val plotScriptData = List(plotter.createPlotScript(gitRepo.fileName))
 
       plotFileCreator ! PlotScript(plotScriptData)
     }
