@@ -50,9 +50,8 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       commitParser ! HashList(userHashes)
 
       val plotter = new GnuPlotter
-      val plotScriptData = List(plotter.createPlotScript(gitRepo.fileName))
 
-      plotFileCreator ! PlotScript(plotScriptData)
+      plotFileCreator ! plotter.createPlotScript(gitRepo.fileName)
     }
   }
 }

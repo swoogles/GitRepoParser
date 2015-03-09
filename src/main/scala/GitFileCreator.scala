@@ -2,10 +2,10 @@ package com.billding.git
 
 import com.billding.Utility
 import com.billding.DataWriter
+import com.billding.PlotScript
 
 import akka.actor.{ ActorLogging, Props, Actor }
 
-case class PlotScript(data:List[String])
 case class DataFile(gitRepo: GitRepo, data:List[String])
 
 object GitDataFileCreator {

@@ -1,5 +1,7 @@
 package com.billding
 
+case class PlotScript(data:List[String])
+
 case class GnuPlotter (
   yMax:Int = 500,
   yMin:Int = -500,
@@ -38,7 +40,8 @@ case class GnuPlotter (
 
     val endPlotSettings = """unset multiplot"""
 
-    imageOutput + plotSettings + totalPlotsReal.reduce(_ + "\n" + _) + endPlotSettings
+    val plotScriptData = List(imageOutput + plotSettings + totalPlotsReal.reduce(_ + "\n" + _) + endPlotSettings)
+    PlotScript(plotScriptData)
   }
 }
 
