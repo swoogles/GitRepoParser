@@ -4,16 +4,10 @@ import com.billding.GnuPlotter
 import com.billding.JsonLogger
 import akka.actor.{ ActorLogging, ActorRef, ActorSystem, Props, Actor }
 
-import scala.concurrent.duration._
-
-import akka.util.Timeout
-//implicit val timeout = Timeout(5 seconds) // This is just a reminder example
-
 object GitDispatcher {
   def props(filesToWrite: Int): Props = Props(new GitDispatcher(filesToWrite))
 }
 class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
-  val home = "/home/bfrasure/"
   def receive = {
     case dataFile: DataFile => {
       val dataFileCreator = context.actorOf(GitDataFileCreator.props(dataFile.gitRepo), dataFile.gitRepo.fileName + "dataFileCreator")
@@ -31,9 +25,6 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       }
     }
     case RepoTarget(gitRepo, email) => {
-      log.info("Let's get to work!")
-      val repoFileName: String = gitRepo.fileName
-
       val entries = JsonLogger.repoLogs(gitRepo.dir)
 
       val userEntries = entries.filter(_.author contains email )

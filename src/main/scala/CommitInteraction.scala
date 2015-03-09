@@ -63,7 +63,6 @@ class CommitParser(gitRepo: GitRepo) extends Actor with ActorLogging{
         )
       } 
     }
-    log.info("commitDeltas created")
     commitDeltas
   }
 }
