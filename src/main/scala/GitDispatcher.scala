@@ -39,14 +39,14 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
     case FileWritten => {
       //context.system.stop(sender) //TODO call this without errors
       filesToWrite -= 1
-      println("filesToWrite left: " + filesToWrite)
+      val repoName: String = s"actor $sender".split("_")(1).split("#")(0) // Get everything after the first underscore and then before the following #
+      println(s"RepoName: $repoName")
       if ( filesToWrite == 0 ) {
         context.system.shutdown()
         GnuPlotter.executePlotScripts()
       }
     }
     case RepoTarget(gitRepo, email) => {
-      println("Starting to delegate")
       val logActor = context.actorOf(JsonLogger.props(), gitRepo.fileName + "logActor")
       
       logActor ! gitRepo
