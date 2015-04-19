@@ -25,8 +25,9 @@ object GitManager {
     )
     val qualifiedRepos = repos.map { "Repositories/" + _ }
 
-    val gitRepos: List[Repo] = qualifiedRepos.map { x=>
-      Repo(x, home)
+    val gitHashes: List[GitHash] = Nil
+    val gitReposWithoutHashes: List[Repo] = qualifiedRepos.map { x=>
+     Repo(x, home, gitHashes)
     }
 
     val system = ActorSystem("helloakka")
@@ -36,13 +37,22 @@ object GitManager {
     val dispatcher = system.actorOf(GitDispatcher.props(filesToWrite), "dispatcher")
 
     for {
-      repo <- gitRepos
+      repo <- gitReposWithoutHashes
     } {
-      val repoTarget = RepoTarget(repo, email)
+      println("Repo: " + repo)
+
+    implicit val program = Seq("git")
+    val loggerArguments = Seq("--git-dir="+repo.dir+".git", "log", "--oneline")
+    val logOutput: Array[String] = com.billding.SystemCommands.runFullCommand(loggerArguments).split("\n")
+
+    //logOutput foreach { println }
+    println("Log output: " + logOutput)
+    println("NumHashes: " + logOutput.length)
+    val hashes: List[GitHash]=  logOutput map { x =>  GitHash(x.split("\\s")(0))} toList
+
+      val repoTarget = RepoTarget(repo.copy(hashes=hashes), email)
       dispatcher ! repoTarget
     }
 
-    val gitRepoB = Repo( "Repos/Diddly/Squat", "/home/billybob")
-    println("gitRepoB: " + gitRepoB.path.getClass)
   }
 }
