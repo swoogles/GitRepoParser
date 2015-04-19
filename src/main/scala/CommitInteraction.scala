@@ -5,9 +5,6 @@ import com.billding.SystemCommands
 
 import akka.actor.{ ActorLogging, Props, Actor }
 
-case class GitHash( hash: String)
-case class HashList( hashes: List[GitHash] )
-
 object CommitParser {
   def props(repo: Repo): Props = Props(new CommitParser(repo))
 }
