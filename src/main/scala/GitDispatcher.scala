@@ -1,9 +1,6 @@
 package com.billding.git
 
 import com.billding.GnuPlotter
-import com.billding.JsonLogger
-import com.billding.RepoLogs
-import com.billding.LogEntry
 import akka.actor.{ ActorLogging, ActorRef, ActorSystem, Props, Actor }
 
 object GitDispatcher {
@@ -11,15 +8,17 @@ object GitDispatcher {
 }
 class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
   def receive = {
-    case repoLogs: RepoLogs => {
-      val email = "frasure"
-      val userEntries = repoLogs.logEntries.filter(_.author contains email )
+    case repo: Repo => {
+      //val email = "frasure"
+      //val userEntries = repoLogs.logEntries.filter(_.author contains email )
 
-      val userHashes = userEntries.map(x=>GitHash(x.commit))
+      //val userHashes = userEntries.map(x=>GitHash(x.commit))
+      
+      val allHashes = repo.hashes
 
-      val commitParser = context.actorOf(CommitParser.props(repoLogs.repo), repoLogs.repo.fileName + "commitParser")
+      val commitParser = context.actorOf(CommitParser.props(repo), repo.fileName + "commitParser")
 
-      val plotFileCreator = context.actorOf(GitDataFileCreator.props(repoLogs.repo), repoLogs.repo.fileName + "plotFileCreator")
+      val plotFileCreator = context.actorOf(GitDataFileCreator.props(repo), repo.fileName + "plotFileCreator")
 
       // After parser does its work, it should tell the results to dataFileCreator
       // I'm sure there's a more proper way where dataFileCreator is already the
@@ -27,12 +26,12 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       //commitParser ! HashList(userHashes)
 
       //commitParser ! HashesAndAction(HashList(userHashes), "createDeltas")
-      commitParser ! HashesAndAction(HashList(userHashes), LineDeltas)
+      commitParser ! HashesAndAction(HashList(allHashes), LineDeltas)
       
 
       val plotter = new GnuPlotter
 
-      plotFileCreator ! plotter.createPlotScript(repoLogs.repo.fileName)
+      plotFileCreator ! plotter.createPlotScript(repo.fileName)
     }
     case dataFile: DataFile => {
       val dataFileCreator: ActorRef = context.actorOf(GitDataFileCreator.props(dataFile.repo), dataFile.repo.fileName + "dataFileCreator")
@@ -49,11 +48,6 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
         context.system.shutdown()
         GnuPlotter.executePlotScripts()
       }
-    }
-    case RepoTarget(repo, email) => {
-      val logActor = context.actorOf(JsonLogger.props(), repo.fileName + "logActor")
-      
-      logActor ! repo
     }
   }
 }

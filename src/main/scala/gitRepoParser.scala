@@ -50,8 +50,9 @@ object GitManager {
     println("NumHashes: " + logOutput.length)
     val hashes: List[GitHash]=  logOutput map { x =>  GitHash(x.split("\\s")(0))} toList
 
-      val repoTarget = RepoTarget(repo.copy(hashes=hashes), email)
-      dispatcher ! repoTarget
+      //val repoTarget = RepoTarget(repo.copy(hashes=hashes), email)
+      //dispatcher ! repoTarget
+      dispatcher ! repo.copy(hashes=hashes)
     }
 
   }
