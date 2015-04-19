@@ -23,7 +23,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       //commitParser ! HashList(userHashes)
 
       //commitParser ! HashesAndAction(HashList(userHashes), "createDeltas")
-      commitParser ! HashesAndAction(HashList(repo.hashes), LineDeltas)
+      commitParser ! LineDeltas
       
 
       val plotter = new GnuPlotter

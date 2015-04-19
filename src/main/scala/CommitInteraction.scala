@@ -9,21 +9,17 @@ sealed trait CommitAction
 object LineDeltas extends CommitAction
 object FilesChanged extends CommitAction
 
-case class HashesAndAction(hashes: HashList, action: CommitAction)
-
 object CommitParser {
   def props(repo: Repo): Props = Props(new CommitParser(repo))
 }
 class CommitParser(repo: Repo) extends Actor with ActorLogging{
 
   def receive = {
-    case HashesAndAction( hashes, LineDeltas) => {
-      println("success?")
-        sender ! DataFile(repo, createDeltas(hashes.hashes))
+    case LineDeltas => {
+        sender ! DataFile(repo, createDeltas(repo.hashes))
     }
-    case HashesAndAction( hashes, FilesChanged) => {
-      println("other")
-        sender ! DataFile(repo, createDeltas(hashes.hashes))
+    case FilesChanged => {
+        sender ! DataFile(repo, createDeltas(repo.hashes))
     }
   }
 
