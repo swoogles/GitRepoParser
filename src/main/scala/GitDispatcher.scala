@@ -24,7 +24,11 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       // After parser does its work, it should tell the results to dataFileCreator
       // I'm sure there's a more proper way where dataFileCreator is already the
       // sender, but this will have to do for now.
-      commitParser ! HashList(userHashes)
+      //commitParser ! HashList(userHashes)
+
+      //commitParser ! HashesAndAction(HashList(userHashes), "createDeltas")
+      commitParser ! HashesAndAction(HashList(userHashes), LineDeltas)
+      
 
       val plotter = new GnuPlotter
 

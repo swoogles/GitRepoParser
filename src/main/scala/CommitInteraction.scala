@@ -5,14 +5,25 @@ import com.billding.SystemCommands
 
 import akka.actor.{ ActorLogging, Props, Actor }
 
+sealed trait CommitAction
+object LineDeltas extends CommitAction
+object FilesChanged extends CommitAction
+
+case class HashesAndAction(hashes: HashList, action: CommitAction)
+
 object CommitParser {
   def props(repo: Repo): Props = Props(new CommitParser(repo))
 }
 class CommitParser(repo: Repo) extends Actor with ActorLogging{
 
   def receive = {
-    case HashList(hashes) => {
-      sender ! DataFile(repo, createDeltas(hashes))
+    case HashesAndAction( hashes, LineDeltas) => {
+      println("success?")
+        sender ! DataFile(repo, createDeltas(hashes.hashes))
+    }
+    case HashesAndAction( hashes, FilesChanged) => {
+      println("other")
+        sender ! DataFile(repo, createDeltas(hashes.hashes))
     }
   }
 
@@ -66,11 +77,7 @@ class CommitParser(repo: Repo) extends Actor with ActorLogging{
 
 case class CommitDelta(idx: Long, linesAdded: Long, linesDeleted: Long)
 {
-  override def toString(): String = {
-    idx + " " + 
-    linesAdded + " " +
-    linesDeleted
-  }
+  override def toString(): String = s"$idx $linesAdded $linesDeleted"
 }
 object CommitDelta {
   implicit def stringifier(cd: CommitDelta): String = cd.toString
