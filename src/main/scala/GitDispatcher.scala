@@ -13,9 +13,6 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       //val userEntries = repoLogs.logEntries.filter(_.author contains email )
 
       //val userHashes = userEntries.map(x=>GitHash(x.commit))
-      
-      val allHashes = repo.hashes
-
       val commitParser = context.actorOf(CommitParser.props(repo), repo.fileName + "commitParser")
 
       val plotFileCreator = context.actorOf(GitDataFileCreator.props(repo), repo.fileName + "plotFileCreator")
@@ -26,7 +23,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       //commitParser ! HashList(userHashes)
 
       //commitParser ! HashesAndAction(HashList(userHashes), "createDeltas")
-      commitParser ! HashesAndAction(HashList(allHashes), LineDeltas)
+      commitParser ! HashesAndAction(HashList(repo.hashes), LineDeltas)
       
 
       val plotter = new GnuPlotter
