@@ -17,9 +17,9 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
 
       val userHashes = userEntries.map(x=>GitHash(x.commit))
 
-      val commitParser: ActorRef= context.actorOf(CommitParser.props(repoLogs.gitRepo), repoLogs.gitRepo.fileName + "commitParser")
+      val commitParser = context.actorOf(CommitParser.props(repoLogs.repo), repoLogs.repo.fileName + "commitParser")
 
-      val plotFileCreator: ActorRef = context.actorOf(GitDataFileCreator.props(repoLogs.gitRepo), repoLogs.gitRepo.fileName + "plotFileCreator")
+      val plotFileCreator = context.actorOf(GitDataFileCreator.props(repoLogs.repo), repoLogs.repo.fileName + "plotFileCreator")
 
       // After parser does its work, it should tell the results to dataFileCreator
       // I'm sure there's a more proper way where dataFileCreator is already the
@@ -28,10 +28,10 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
 
       val plotter = new GnuPlotter
 
-      plotFileCreator ! plotter.createPlotScript(repoLogs.gitRepo.fileName)
+      plotFileCreator ! plotter.createPlotScript(repoLogs.repo.fileName)
     }
     case dataFile: DataFile => {
-      val dataFileCreator: ActorRef = context.actorOf(GitDataFileCreator.props(dataFile.gitRepo), dataFile.gitRepo.fileName + "dataFileCreator")
+      val dataFileCreator: ActorRef = context.actorOf(GitDataFileCreator.props(dataFile.repo), dataFile.repo.fileName + "dataFileCreator")
 
       dataFileCreator ! dataFile
     }
@@ -46,10 +46,10 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
         GnuPlotter.executePlotScripts()
       }
     }
-    case RepoTarget(gitRepo, email) => {
-      val logActor = context.actorOf(JsonLogger.props(), gitRepo.fileName + "logActor")
+    case RepoTarget(repo, email) => {
+      val logActor = context.actorOf(JsonLogger.props(), repo.fileName + "logActor")
       
-      logActor ! gitRepo
+      logActor ! repo
     }
   }
 }

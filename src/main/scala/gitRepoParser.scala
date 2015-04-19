@@ -2,7 +2,7 @@ package com.billding.git
 
 import akka.actor.{ ActorSystem, Actor}
 
-case class RepoTarget(gitRepo: GitRepo, email: String)
+case class RepoTarget(repo: Repo, email: String)
 
 object GitManager {
   val home = "/home/bfrasure/"
@@ -25,8 +25,8 @@ object GitManager {
     )
     val qualifiedRepos = repos.map { "Repositories/" + _ }
 
-    val gitRepos: List[GitRepo] = qualifiedRepos.map { x=>
-      GitRepo(x, home)
+    val gitRepos: List[Repo] = qualifiedRepos.map { x=>
+      Repo(x, home)
     }
 
     val system = ActorSystem("helloakka")
@@ -42,7 +42,7 @@ object GitManager {
       dispatcher ! repoTarget
     }
 
-    val gitRepoB = GitRepo( "Repos/Diddly/Squat", "/home/billybob")
+    val gitRepoB = Repo( "Repos/Diddly/Squat", "/home/billybob")
     println("gitRepoB: " + gitRepoB.path.getClass)
   }
 }

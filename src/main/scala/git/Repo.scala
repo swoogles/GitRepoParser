@@ -3,7 +3,7 @@ package com.billding.git
 import java.nio.file.Path
 import java.nio.file.Paths
 
-case class GitRepo(path: Path, home: Path) {
+case class Repo(path: Path, home: Path) {
   def fileName(): String = {
     path.toString.replaceAll("/","_")
   }
@@ -11,8 +11,8 @@ case class GitRepo(path: Path, home: Path) {
     home + "/" + path.toString + "/"
   }
 }
-object GitRepo {
+object Repo {
   def apply(pathString: String, homeString: String) = {
-    new GitRepo( Paths.get(pathString), Paths.get(homeString))
+    new Repo( Paths.get(pathString), Paths.get(homeString))
   }
 }

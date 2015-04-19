@@ -6,17 +6,17 @@ import com.billding.PlotScript
 
 import akka.actor.{ ActorLogging, Props, Actor }
 
-case class DataFile(gitRepo: GitRepo, data:List[String])
+case class DataFile(repo: Repo, data:List[String])
 
 object GitDataFileCreator {
-  def props(gitRepo: GitRepo): Props = Props(new GitDataFileCreator(gitRepo))
+  def props(repo: Repo): Props = Props(new GitDataFileCreator(repo))
 }
 class GitDataFileCreator(
-  gitRepo: GitRepo
+  repo: Repo
 ) extends Actor with ActorLogging
 {
   def receive = {
-    case DataFile(gitRepo, data) => {
+    case DataFile(repo, data) => {
       writeDataFile(data)
       sender ! FileWritten
     }
@@ -30,12 +30,12 @@ class GitDataFileCreator(
   val utility: Utility = new Utility
 
   def writePlotScript(data:List[String]) = {
-    val plotScriptName = "plotfiles/" + gitRepo.fileName + ".gnuplot"
+    val plotScriptName = "plotfiles/" + repo.fileName + ".gnuplot"
     dataWriter.write(data, plotScriptName, utility)
   }
 
   def writeDataFile(data:List[String]) = {
-    val dataFileName = "data/" + gitRepo.fileName +".dat" 
+    val dataFileName = "data/" + repo.fileName +".dat" 
     dataWriter.write(data, dataFileName, utility)
   }
 }

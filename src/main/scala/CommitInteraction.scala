@@ -9,18 +9,18 @@ case class GitHash( hash: String)
 case class HashList( hashes: List[GitHash] )
 
 object CommitParser {
-  def props(gitRepo: GitRepo): Props = Props(new CommitParser(gitRepo))
+  def props(repo: Repo): Props = Props(new CommitParser(repo))
 }
-class CommitParser(gitRepo: GitRepo) extends Actor with ActorLogging{
+class CommitParser(repo: Repo) extends Actor with ActorLogging{
 
   def receive = {
     case HashList(hashes) => {
-      sender ! DataFile(gitRepo, createDeltas(hashes))
+      sender ! DataFile(repo, createDeltas(hashes))
     }
   }
 
   implicit val program = Seq("git")
-  val gitDirectoryArguments = Seq("--git-dir=" + gitRepo.dir + ".git", "--work-tree=" + gitRepo.dir)
+  val gitDirectoryArguments = Seq("--git-dir=" + repo.dir + ".git", "--work-tree=" + repo.dir)
 
   def getFirstNum(wordsString:String):Int = {
     val words = wordsString split("\\s+")

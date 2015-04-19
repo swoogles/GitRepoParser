@@ -1,15 +1,21 @@
 package com.billding
 
-import argonaut._
+//import argonaut.{CodecJson}
+//import  Argonaut.EncodeJson
+
+import argonaut.{
+  Argonaut,
+  CodecJson
+}
 import  Argonaut._
 
-import com.billding.git.GitRepo
+import com.billding.git.Repo
 
 import akka.actor.{ ActorLogging, Props, Actor }
 
 case class LogEntry(commit: String, author: String, date: Option[String], message: Option[String])
 
-case class RepoLogs(gitRepo: GitRepo, logEntries: List[LogEntry])
+case class RepoLogs(repo: Repo, logEntries: List[LogEntry])
 
 object LogEntry {
   implicit def LogEntryCodecJson: CodecJson[LogEntry] =
@@ -18,8 +24,8 @@ object LogEntry {
 
 class JsonLogger extends Actor with ActorLogging {
   def receive = {
-    case gitRepo: GitRepo => {
-      sender ! JsonLogger.repoLogs(gitRepo)
+    case repo: Repo => {
+      sender ! JsonLogger.repoLogs(repo)
     }
   }
 }
@@ -29,11 +35,11 @@ object JsonLogger {
 
   def props(): Props = Props(new JsonLogger())
 
-  def repoLogs(gitRepo: GitRepo): RepoLogs  = {
-    val loggerArguments = Seq(gitRepo.dir)
+  def repoLogs(repo: Repo): RepoLogs  = {
+    val loggerArguments = Seq(repo.dir)
     val logOutput = SystemCommands.runFullCommand(loggerArguments)
     val entries: List[LogEntry] = logOutput.decodeOption[List[LogEntry]].getOrElse(Nil)
-    RepoLogs(gitRepo, entries)
+    RepoLogs(repo, entries)
   }
 }
 
