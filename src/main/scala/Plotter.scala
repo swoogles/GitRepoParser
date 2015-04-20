@@ -45,16 +45,17 @@ case class GnuPlotter (
   }
 }
 
-object GnuPlotter {
+object GnuPlotter extends Client{
+  val program = Seq("gnuplot")
+  val commonArguments = Nil
 
   def plotColumn(project:String, column:Int, color:String):String = {
     "plot 'data/" + project + ".dat' using 1:" + column + " lt rgb \"" + color + "\" w line \n"
   }
 
-  implicit val program = Seq("gnuplot")
   def executePlotScripts() = {
     val plotScriptDir = Seq("plotfiles/*")
-    SystemCommands.runFullCommandWithWildCards(plotScriptDir)
+    execute(plotScriptDir)
   }
 
 }
