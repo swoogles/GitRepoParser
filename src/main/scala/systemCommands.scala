@@ -4,6 +4,19 @@ import scala.sys.process._
 import scala.sys.process.Process
 import scala.sys.process.ProcessBuilder
 
+trait Client {
+  val program:Seq[String]
+  val commonArguments:Seq[String] 
+  def execute = {
+    val fullCommand = (program++commonArguments)
+    fullCommand!!
+  }
+  def execute(arguments: Seq[String]) = {
+    val fullCommand = (program++commonArguments++arguments)
+    fullCommand!!
+  }
+}
+
 object SystemCommands {
   def runFullCommand (arguments:Seq[String] )( implicit program:Seq[String]):String = {
     val fullCommand = (program++arguments)
