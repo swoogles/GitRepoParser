@@ -6,6 +6,16 @@ import akka.actor.{ ActorLogging, Props, Actor }
 
 import com.billding.Client
 
+trait Weird {
+  sealed trait Sealed
+}
+
+case class WeirdUser(
+  val idx: Long
+) extends Weird {
+  object SealedA extends Sealed
+}
+
 sealed trait CommitAction
 object LineDeltas extends CommitAction
 object FilesChanged extends CommitAction
