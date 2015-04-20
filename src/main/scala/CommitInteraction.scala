@@ -1,9 +1,10 @@
 package com.billding.git
 
 import util.matching.Regex
-import com.billding.SystemCommands
 
 import akka.actor.{ ActorLogging, Props, Actor }
+
+import com.billding.Client
 
 sealed trait CommitAction
 object LineDeltas extends CommitAction
@@ -12,7 +13,7 @@ object FilesChanged extends CommitAction
 object CommitParser {
   def props(repo: Repo): Props = Props(new CommitParser(repo))
 }
-class CommitParser(repo: Repo) extends Actor with ActorLogging{
+class CommitParser(repo: Repo) extends Actor with ActorLogging with Client{
 
   def receive = {
     case LineDeltas => {
@@ -23,8 +24,8 @@ class CommitParser(repo: Repo) extends Actor with ActorLogging{
     }
   }
 
-  implicit val program = Seq("git")
-  val gitDirectoryArguments = Seq("--git-dir=" + repo.dir + ".git", "--work-tree=" + repo.dir)
+  val program = Seq("git")
+  val commonArguments = Seq("--git-dir=" + repo.dir + ".git", "--work-tree=" + repo.dir)
 
   def getFirstNum(wordsString:String):Int = {
     val words = wordsString split("\\s+")
@@ -54,7 +55,7 @@ class CommitParser(repo: Repo) extends Actor with ActorLogging{
     val numStat = Seq("--numstat")
     val shortStat = Seq("--shortstat")
     val oneLine = Seq("--oneline")
-    SystemCommands.runFullCommand(gitDirectoryArguments++Seq(action, gitHash.hash)++shortStat)
+    execute(Seq(action, gitHash.hash)++shortStat)
   }
 
   def createDeltas(hashes: List[GitHash]): List[CommitDelta] = {
