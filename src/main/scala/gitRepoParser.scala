@@ -2,8 +2,6 @@ package com.billding.git
 
 import akka.actor.{ ActorSystem, Actor}
 
-case class RepoTarget(repo: Repo, email: String)
-
 object GitManager {
   val home = "/home/bfrasure/"
 
@@ -22,13 +20,7 @@ object GitManager {
       "Physics",
       "ProjectEuler",
       "RoundToNearestX"
-    )
-    val qualifiedRepos = repos.map { "Repositories/" + _ }
-
-    val gitHashes: List[GitHash] = Nil
-    val gitReposWithoutHashes: List[Repo] = qualifiedRepos.map { x=>
-      Repo(x, home)
-    }
+    ) map {  x => Repo("Repositories/" + x , home) }
 
     val system = ActorSystem("helloakka")
     val numRepos = repos.size
@@ -36,12 +28,8 @@ object GitManager {
     val filesToWrite = numRepos * filesPerRepo
     val dispatcher = system.actorOf(GitDispatcher.props(filesToWrite), "dispatcher")
 
-
-    for {
-      repo <- gitReposWithoutHashes
-      } {
-        dispatcher ! repo
-      }
+    for { repo <- repos } 
+      { dispatcher ! repo }
 
   }
 }
