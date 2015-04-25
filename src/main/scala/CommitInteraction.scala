@@ -33,7 +33,7 @@ class CommitParser(repo: Repo) extends Actor with ActorLogging with Client{
   }
 
   def getNumberWithPattern(hash: GitHash, pattern: Regex ):Int = {
-    val commitInfo = showFullCommit(hash)
+    val commitInfo = logFullCommit(hash)
     val combinedRegex = ("\\d+ " + pattern.toString).r
     val matchingStrings = combinedRegex findAllIn commitInfo
     if (matchingStrings nonEmpty)
@@ -50,7 +50,7 @@ class CommitParser(repo: Repo) extends Actor with ActorLogging with Client{
   def getLinesAdded(hash: GitHash):Int = getNumberWithPattern(hash, "insertions")
   def getLinesDeleted(hash: GitHash):Int = getNumberWithPattern(hash, "deletions")
 
-  def showFullCommit(gitHash: GitHash):String = {
+  def logFullCommit(gitHash: GitHash):String = {
     val program = "show"
 
     sealed abstract class DisplayVariant {
@@ -60,8 +60,7 @@ class CommitParser(repo: Repo) extends Actor with ActorLogging with Client{
     case object SHORTSTAT extends DisplayVariant { val parameter = Seq("--shortstat") }
     case object ONELINE extends DisplayVariant { val parameter = Seq("--oneline") }
 
-    val logCommand = SubCommand(this,program, ONELINE.parameter)
-    logCommand!!
+    repo.logCommand.execute(ONELINE.parameter)
   }
 
   def createDeltas(hashes: List[GitHash]): List[CommitDelta] = {

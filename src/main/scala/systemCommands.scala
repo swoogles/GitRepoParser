@@ -10,12 +10,16 @@ trait Executable {
   }
 }
 
-trait ExecutableStandAlone extends Executable {
+trait ExecutableStandAlone extends Executable{
   val program:Seq[String]
   val persistentArguments:Seq[String] 
 
   def execute(): String = {
     execute(program++persistentArguments)
+  }
+
+  override def execute(arguments: Seq[String]): String = {
+    super.execute(program++persistentArguments)
   }
 
   def !!(): String = {
@@ -33,7 +37,13 @@ trait Client extends ExecutableStandAlone{
 
 }
 
-case class SubCommand(client: Client, subProgram: String, subPersistentArguments: Seq[String] = Nil) extends ExecutableStandAlone{
-  val program: Seq[String] = client.program++client.persistentArguments++Seq(subProgram)
+case class SubCommand(client: Client, subProgram: Seq[String], subPersistentArguments: Seq[String]) extends ExecutableStandAlone{
+  val program: Seq[String] = client.program++client.persistentArguments++subProgram
   val persistentArguments: Seq[String] = subPersistentArguments
+}
+
+object SubCommand {
+  def apply(client: Client, subProgram: String, subPersistentArguments: Seq[String]): SubCommand = {
+    SubCommand(client, Seq(subProgram), subPersistentArguments)
+  }
 }

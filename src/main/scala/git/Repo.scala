@@ -18,16 +18,16 @@ case class Repo(path: Path, home: Path) extends Client {
 
   def firstWord(x: String) = x.split("\\s")(0)
 
-  val showCommand = SubCommand(this,"show")
-  val show = showCommand.execute()
+  val showCommand = SubCommand(this,"show", Seq())
+  def show = showCommand.execute()
 
   val logCommand = SubCommand(this,"log", Seq("--oneline"))
 
-  val todayCommand = SubCommand(this,"today")
-  val today = todayCommand.execute()
+  val todayCommand = SubCommand(this,"today", Seq())
+  def today = todayCommand.execute()
 
-  val statusCommand = SubCommand(this,"status")
-  val status = statusCommand.execute()
+  val statusCommand = SubCommand(this,"status", Seq(""))
+  def status = statusCommand.execute()
 
   // I'm going to keep this a def instead of a val, because even though it has no paramaters, 
   // it's still executing an external command with results that could change.
