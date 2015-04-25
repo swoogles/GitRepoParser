@@ -18,7 +18,7 @@ case class Repo(path: Path, home: Path) extends Client {
 
   def firstWord(x: String) = x.split("\\s")(0)
 
-  val showCommand = SubCommand(this,"show", Nil)
+  val showCommand = SubCommand(this,"show")
   def show() = showCommand.execute()
 
   val logCommand = SubCommand(this,"log", Seq("--oneline"))
