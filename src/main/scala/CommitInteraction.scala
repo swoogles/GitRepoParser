@@ -4,7 +4,7 @@ import util.matching.Regex
 
 import akka.actor.{ ActorLogging, Props, Actor }
 
-import com.billding.Client
+import com.billding.{Client, SubCommand}
 
 sealed trait CommitAction
 object LineDeltas extends CommitAction
@@ -51,11 +51,17 @@ class CommitParser(repo: Repo) extends Actor with ActorLogging with Client{
   def getLinesDeleted(hash: GitHash):Int = getNumberWithPattern(hash, "deletions")
 
   def showFullCommit(gitHash: GitHash):String = {
-    val action = "show"
-    val numStat = Seq("--numstat")
-    val shortStat = Seq("--shortstat")
-    val oneLine = Seq("--oneline")
-    execute(Seq(action, gitHash.hash)++shortStat)
+    val program = "show"
+
+    sealed abstract class DisplayVariant {
+      val parameter: Seq[String]
+    }
+    case object NUMSTAT extends DisplayVariant { val parameter = Seq("--numstat") }
+    case object SHORTSTAT extends DisplayVariant { val parameter = Seq("--shortstat") }
+    case object ONELINE extends DisplayVariant { val parameter = Seq("--oneline") }
+
+    val logCommand = SubCommand(this,program, ONELINE.parameter)
+    logCommand!!
   }
 
   def createDeltas(hashes: List[GitHash]): List[CommitDelta] = {
