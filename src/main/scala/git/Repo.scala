@@ -23,6 +23,9 @@ case class Repo(path: Path, home: Path) extends Client {
 
   val logCommand = SubCommand(this,"log", Seq("--oneline"))
 
+  val todayCommand = SubCommand(this,"today")
+  def today() = todayCommand.execute()
+
   // I'm going to keep this a def instead of a val, because even though it has no paramaters, 
   // it's still executing an external command with results that could change.
   def hashes: List[GitHash] = {
