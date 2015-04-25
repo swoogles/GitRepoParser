@@ -19,12 +19,10 @@ case class Repo(path: Path, home: Path) extends Client {
   def firstWord(x: String) = x.split("\\s")(0)
 
   val showCommand = SubCommand(this,"show")
-  def show = showCommand.execute()
 
-  val logCommand = SubCommand(this,"log", Seq("--oneline"))
+  val logCommand = SubCommand(this,"log")
 
   val todayCommand = SubCommand(this,"today")
-  def today = todayCommand.execute()
 
   val statusCommand = SubCommand(this,"status")
   def status = statusCommand.execute()
@@ -33,8 +31,8 @@ case class Repo(path: Path, home: Path) extends Client {
   // it's still executing an external command with results that could change.
   def hashes: List[GitHash] = {
 
-    val logOutput: Array[String] = logCommand.execute().split("\n")
-
+    val logOutput: Array[String] = logCommand.execute(Seq("--oneline")).split("\n")
+    
     logOutput map { x =>  GitHash(firstWord(x))} toList
   }
 

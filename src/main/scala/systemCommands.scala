@@ -15,11 +15,11 @@ trait ExecutableStandAlone extends Executable{
   val persistentArguments:Seq[String] 
 
   def execute(): String = {
-    execute(program++persistentArguments)
+    execute(Nil)
   }
 
   override def execute(arguments: Seq[String]): String = {
-    super.execute(program++persistentArguments)
+    super.execute(program++persistentArguments++arguments)
   }
 
   def !!(): String = {
