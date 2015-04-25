@@ -22,22 +22,6 @@ trait Client {
   }
 }
 
-trait ClientA {
-  sealed trait SubCommand{
-    val cmd: String
-  }
-}
-
-case class WeirdUser(
-  val idx: Long
-) extends ClientA {
-  object Show extends SubCommand {
-    val cmd = "show"
-  }
-
-}
-
-
 object SystemCommands {
   def runFullCommand (arguments:Seq[String] )( implicit program:Seq[String]):String = {
     val fullCommand = (program++arguments)
