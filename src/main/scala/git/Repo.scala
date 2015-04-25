@@ -24,6 +24,8 @@ case class Repo(path: Path, home: Path) extends Client {
 
   val todayCommand = SubCommand(this,"today")
 
+  val branchCommand = SubCommand(this,"branch")
+
   val statusCommand = SubCommand(this,"status")
   def status = statusCommand.execute()
 
