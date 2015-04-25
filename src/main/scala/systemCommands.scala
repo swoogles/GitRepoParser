@@ -5,14 +5,8 @@ import scala.sys.process.Process
 import scala.sys.process.ProcessBuilder
 
 trait Executable {
-  def execute = {
-    val fullCommand = (program)
-    fullCommand!!
-  }
-
-  def execute(arguments: Seq[String]) = {
-    val fullCommand = (program++arguments)
-    fullCommand!!
+  def execute(arguments: Seq[String]): String = {
+    arguments!!
   }
 }
 
@@ -21,11 +15,27 @@ trait Client extends Executable{
   val program:Seq[String]
   val commonArguments:Seq[String] 
 
-  override def execute() = {
-    execute(commonArguments)
+  override def execute(arguments: Seq[String]): String  = {
+    super.execute(program++commonArguments++arguments)
   }
 
 }
+
+//trait SubCommand extends Client
+
+case class SubCommand(subProgram: String) extends Client{
+  val program = Seq(subProgram)
+
+  val commonArguments = Nil
+  //def execute(): String  = {
+  //  execute(commonArguments)
+  //}
+
+}
+
+//object SubCommand {
+//  def apply(program: String) = {
+      
 
 object SystemCommands {
   def runFullCommand (arguments:Seq[String] )( implicit program:Seq[String]):String = {

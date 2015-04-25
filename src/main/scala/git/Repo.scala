@@ -3,7 +3,7 @@ package com.billding.git
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import com.billding.Client
+import com.billding.{Client, SubCommand}
 
 case class Repo(path: Path, home: Path) extends Client {
   val program = Seq("git")
@@ -18,6 +18,8 @@ case class Repo(path: Path, home: Path) extends Client {
 
   def firstWord(x: String) = x.split("\\s")(0)
 
+  //def show = SubCommand("log").execute
+
   // I'm going to keep this a def instead of a val, because even though it has no paramaters, 
   // it's still executing an external command with results that could change.
   def hashes: List[GitHash] = {
@@ -30,7 +32,7 @@ case class Repo(path: Path, home: Path) extends Client {
 } 
 
 object Repo {
-  def apply(pathString: String, homeString: String) = {
-    new Repo( Paths.get(pathString), Paths.get(homeString))
+  def apply(pathString: String, homeString: String): Repo = {
+    Repo( Paths.get(pathString), Paths.get(homeString))
   }
 }
