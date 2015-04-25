@@ -26,7 +26,12 @@ case class SubCommand(client: Client, subProgram: String) extends Executable{
 
   val commonArguments = Nil
   def execute(): String  = {
-    execute(program)
+    execute(Nil)
+  }
+
+  override def execute(arguments: Seq[String]): String = {
+    println(s"Command: ${program++arguments}")
+    program++arguments!!
   }
 
 }
