@@ -21,9 +21,7 @@ trait Client extends Executable{
 
 }
 
-//trait SubCommand extends Client
-
-case class SubCommand(programBase: Seq[String], subProgram: String) extends Client{
+case class SubCommand(programBase: Seq[String], subProgram: String) extends Executable{
   val program: Seq[String] = programBase++Seq(subProgram)
 
   val commonArguments = Nil
