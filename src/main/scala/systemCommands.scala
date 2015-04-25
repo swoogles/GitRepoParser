@@ -7,6 +7,11 @@ import scala.sys.process.ProcessBuilder
 trait Client {
   val program:Seq[String]
   val commonArguments:Seq[String] 
+
+  sealed trait SubCommand{
+    val cmd: String
+  }
+
   def execute = {
     val fullCommand = (program++commonArguments)
     fullCommand!!
