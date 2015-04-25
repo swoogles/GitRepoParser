@@ -4,22 +4,27 @@ import scala.sys.process._
 import scala.sys.process.Process
 import scala.sys.process.ProcessBuilder
 
-trait Client {
+trait Executable {
+  def execute = {
+    val fullCommand = (program)
+    fullCommand!!
+  }
+
+  def execute(arguments: Seq[String]) = {
+    val fullCommand = (program++arguments)
+    fullCommand!!
+  }
+}
+
+trait Client extends Executable{
+
   val program:Seq[String]
   val commonArguments:Seq[String] 
 
-  sealed trait SubCommand{
-    val cmd: String
+  override def execute() = {
+    execute(commonArguments)
   }
 
-  def execute = {
-    val fullCommand = (program++commonArguments)
-    fullCommand!!
-  }
-  def execute(arguments: Seq[String]) = {
-    val fullCommand = (program++commonArguments++arguments)
-    fullCommand!!
-  }
 }
 
 object SystemCommands {
