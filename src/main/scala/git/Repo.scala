@@ -18,7 +18,8 @@ case class Repo(path: Path, home: Path) extends Client {
 
   def firstWord(x: String) = x.split("\\s")(0)
 
-  //def show = SubCommand("log").execute
+  val showCommand = SubCommand(program)
+  def show() = showCommand.execute("show")
 
   // I'm going to keep this a def instead of a val, because even though it has no paramaters, 
   // it's still executing an external command with results that could change.

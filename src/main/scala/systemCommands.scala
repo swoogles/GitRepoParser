@@ -23,13 +23,13 @@ trait Client extends Executable{
 
 //trait SubCommand extends Client
 
-case class SubCommand(subProgram: String) extends Client{
-  val program = Seq(subProgram)
+case class SubCommand(subProgram: Seq[String]) extends Client{
+  val program = subProgram
 
   val commonArguments = Nil
-  //def execute(): String  = {
-  //  execute(commonArguments)
-  //}
+  def execute(argument: String): String  = {
+    execute(Seq(argument))
+  }
 
 }
 
