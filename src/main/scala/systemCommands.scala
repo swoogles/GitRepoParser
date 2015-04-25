@@ -43,7 +43,7 @@ case class SubCommand(client: Client, subProgram: Seq[String], subPersistentArgu
 }
 
 object SubCommand {
-  def apply(client: Client, subProgram: String, subPersistentArguments: Seq[String]): SubCommand = {
+  def apply(client: Client, subProgram: String, subPersistentArguments: Seq[String] = Nil): SubCommand = {
     SubCommand(client, Seq(subProgram), subPersistentArguments)
   }
 }
