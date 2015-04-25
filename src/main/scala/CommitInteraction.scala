@@ -25,7 +25,7 @@ class CommitParser(repo: Repo) extends Actor with ActorLogging with Client{
   }
 
   val program = Seq("git")
-  val commonArguments = Seq("--git-dir=" + repo.dir + ".git", "--work-tree=" + repo.dir)
+  val persistentArguments = Seq("--git-dir=" + repo.dir + ".git", "--work-tree=" + repo.dir)
 
   def getFirstNum(wordsString:String):Int = {
     val words = wordsString split("\\s+")

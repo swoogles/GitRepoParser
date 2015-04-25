@@ -10,28 +10,28 @@ trait Executable {
   }
 }
 
-trait Client extends Executable{
+trait ExecutableStandalone {
+  val program:Seq[String]
+  val persistentArguments:Seq[String] 
+
+  def execute(): String = {
+    program++persistentArguments!!
+  }
+}
+
+trait Client extends Executable with ExecutableStandalone{
 
   val program:Seq[String]
-  val commonArguments:Seq[String] 
+  val persistentArguments:Seq[String] 
 
   override def execute(arguments: Seq[String]): String  = {
-    super.execute(program++commonArguments++arguments)
+    super.execute(program++persistentArguments++arguments)
   }
 
 }
 
-case class SubCommand(client: Client, subProgram: String) extends Executable{
-  val program: Seq[String] = client.program++client.commonArguments++Seq(subProgram)
-
-  val commonArguments = Nil
-  def execute(): String  = {
-    execute(Nil)
-  }
-
-  override def execute(arguments: Seq[String]): String = {
-    println(s"Command: ${program++arguments}")
-    program++arguments!!
-  }
+case class SubCommand(client: Client, subProgram: String, subPersistentArguments: Seq[String]) extends Executable with ExecutableStandalone{
+  val program: Seq[String] = client.program++client.persistentArguments++Seq(subProgram)
+  val persistentArguments: Seq[String] = subPersistentArguments
 
 }
