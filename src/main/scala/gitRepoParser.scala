@@ -15,12 +15,7 @@ object GitManager {
     val email = args(0).split("\\s+")(0)
     val actionParam = args(0).split("\\s+")(1)
 
-    val availableActions = Map(
-      "FilesChanged" -> FilesChanged,
-      "LineDeltas" -> LineDeltas
-  )
-
-    val chosenAction: Option[RepoAction] = availableActions.get(actionParam)
+    val chosenAction: Option[RepoAction] = RepoAction.availableActions.get(actionParam)
 
     val repos = List(
       //"AtomicScala",
@@ -43,13 +38,12 @@ object GitManager {
         val filesPerRepo = 2
         val filesToWrite = numRepos * filesPerRepo
         val dispatcher = system.actorOf(GitDispatcher.props(filesToWrite), "dispatcher")
-        for { repo <- repos } 
-        { dispatcher ! RepoAndAction(repo, repoAction) }
+
+        for { repo <- repos } { dispatcher ! RepoAndAction(repo, repoAction) }
       }
       case None =>  {
         println(s"\nBad Action: ${actionParam}")
-        //println(s"Available Actions:\n${availableActions.keys.mkString("\n")}")
-        println(s"\nAvailable Actions:${availableActions.keys.foldLeft("\t")(_ + "\n-" + _)}")
+        println(s"\nAvailable Actions:${RepoAction.availableActions.keys.foldLeft("\t")(_ + "\n-" + _)}")
       }
     }
 

@@ -19,6 +19,12 @@ object FilesChanged extends RepoAction {
   val pp = PlotProperties(15, 0, 1)
 }
       
+object RepoAction {
+  val availableActions = Map[String, RepoAction](
+    "FilesChanged" -> FilesChanged,
+    "LineDeltas" -> LineDeltas
+  )
+}
 
 
 case class Repo(path: Path, home: Path) extends Client {
