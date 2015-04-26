@@ -32,11 +32,12 @@ object RepoAction {
       case Some(action) => Success(action)
       case None => { 
         val errorMsg = 
-        s""""\nBad Action: ${desiredAction}
+        s"""
+        Bad Action: ${desiredAction}
         Available Actions:${RepoAction.availableActions.keys.foldLeft("\t")(_ + "\n-" + _)}
         """
         Failure( new Exception(errorMsg) ) 
-    }
+      }
     }
   }
 }

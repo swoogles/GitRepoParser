@@ -40,20 +40,10 @@ object Plotter extends Client{
     val startCol = 2
     val colors = List("green", "red", "pink", "blue")
     val colRange = Range(startCol, startCol + pp.numCols)
-    println(s"pp.numCols: ${pp.numCols}")
-
-    // After mapping elements from a range to their original values,
-    // I have a vector of values, which I then convert to a List so that I can 
-    // zip all specified columns with their respective colors
-    //colRange.map(x=>x).toList zip colors foreach println
 
     val colsAndColors = colRange zip colors 
-    println(s"colsAndColors: ${colsAndColors}")
 
     val totalPlotsReal = colsAndColors map{ entry => Plotter.plotColumn(project, entry._1, entry._2) } 
-
-    //println(s"totalPlotsReal: ${totalPlotsReal.reduce(_ + "\n" + _)}")
-
 
     val endPlotSettings = """unset multiplot"""
 
