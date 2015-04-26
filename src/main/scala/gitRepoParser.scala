@@ -4,7 +4,7 @@ import akka.actor.{ ActorSystem, Actor}
 
 case class RepoAndAction (
   repo: Repo, 
-  commitAction: CommitAction
+  repoAction: RepoAction
 )
 
 object GitManager {
@@ -20,7 +20,7 @@ object GitManager {
       "LineDeltas" -> LineDeltas
   )
 
-    val chosenAction: Option[CommitAction] = availableActions.get(actionParam)
+    val chosenAction: Option[RepoAction] = availableActions.get(actionParam)
 
     val repos = List(
       //"AtomicScala",
@@ -37,14 +37,14 @@ object GitManager {
 
 
     chosenAction match {
-      case Some(commitAction) => {
+      case Some(repoAction) => {
         val system = ActorSystem("helloakka")
         val numRepos = repos.size
         val filesPerRepo = 2
         val filesToWrite = numRepos * filesPerRepo
         val dispatcher = system.actorOf(GitDispatcher.props(filesToWrite), "dispatcher")
         for { repo <- repos } 
-        { dispatcher ! RepoAndAction(repo, commitAction) }
+        { dispatcher ! RepoAndAction(repo, repoAction) }
       }
       case None =>  {
         println(s"\nBad Action: ${actionParam}")

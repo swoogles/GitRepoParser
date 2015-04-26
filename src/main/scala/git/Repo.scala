@@ -5,7 +5,21 @@ import java.nio.file.Paths
 
 import com.billding.{Client, SubCommand}
 
+import com.billding.PlotProperties
+
 import scala.language.postfixOps
+
+sealed trait RepoAction {
+  val pp: PlotProperties
+}
+object LineDeltas extends RepoAction {
+  val pp = PlotProperties(500, -500, 2)
+}
+object FilesChanged extends RepoAction {
+  val pp = PlotProperties(15, 0, 1)
+}
+      
+
 
 case class Repo(path: Path, home: Path) extends Client {
   val program = Seq("git")
