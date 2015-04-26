@@ -10,9 +10,18 @@ import scala.language.postfixOps
 
 import scala.language.implicitConversions
 
-sealed trait CommitAction
-object LineDeltas extends CommitAction
-object FilesChanged extends CommitAction
+import com.billding.PlotProperties
+
+sealed trait CommitAction {
+  val pp: PlotProperties
+}
+object LineDeltas extends CommitAction {
+  val pp = PlotProperties(500, -500, 2)
+}
+object FilesChanged extends CommitAction {
+  val pp = PlotProperties(15, 0, 1)
+}
+      
 
 object CommitParser {
   def props(repo: Repo): Props = Props(new CommitParser(repo))
