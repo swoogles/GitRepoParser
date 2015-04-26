@@ -2,14 +2,28 @@ package com.billding
 
 case class PlotScript(data:List[String])
 
+case class PlotProperties(
+  yMax:Int = 500,
+  yMin:Int = -500,
+  xMax:Int = 0,
+  xMin:Int = 0,
+  numCols:Int = 3,
+  filename: String = "blah.png"
+)
+
 case class GnuPlotter (
   yMax:Int = 500,
   yMin:Int = -500,
   xMax:Int = 0,
   xMin:Int = 0,
   numCols:Int = 2,
-  filename: String = "programmatic.png"
+  filename: String = "programmatic.png",
+  pp: PlotProperties = PlotProperties()
 ) {
+
+  def createDynamicPlotFile(pp: PlotProperties) = {
+
+  }
 
   def createPlotScript(project:String) = {
     val imageOutput = s"""
@@ -26,8 +40,9 @@ case class GnuPlotter (
     """
 
     val startCol = 2
-    val colors = List("green", "red")
-    val colRange = Range(startCol, startCol + numCols)
+    val colors = List("green", "red", "pink", "blue")
+    val colRange = Range(startCol, startCol + pp.numCols)
+    println(s"pp.numCols: ${pp.numCols}")
 
     // After mapping elements from a range to their original values,
     // I have a vector of values, which I then convert to a List so that I can 
@@ -35,8 +50,12 @@ case class GnuPlotter (
     //colRange.map(x=>x).toList zip colors foreach println
 
     val colsAndColors = colRange zip colors 
+    println(s"colsAndColors: ${colsAndColors}")
 
     val totalPlotsReal = colsAndColors map{ entry => GnuPlotter.plotColumn(project, entry._1, entry._2) } 
+
+    //println(s"totalPlotsReal: ${totalPlotsReal.reduce(_ + "\n" + _)}")
+
 
     val endPlotSettings = """unset multiplot"""
 
