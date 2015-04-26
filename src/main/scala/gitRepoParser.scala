@@ -2,6 +2,11 @@ package com.billding.git
 
 import akka.actor.{ ActorSystem, Actor}
 
+case class RepoAndAction (
+  repo: Repo, 
+  commitAction: CommitAction
+)
+
 object GitManager {
   val home = "/home/bfrasure/"
 
@@ -28,8 +33,11 @@ object GitManager {
     val filesToWrite = numRepos * filesPerRepo
     val dispatcher = system.actorOf(GitDispatcher.props(filesToWrite), "dispatcher")
 
+    //val commitAction: CommitAction = FilesChanged
+    val commitAction: CommitAction = LineDeltas
+
     for { repo <- repos } 
-      { dispatcher ! repo }
+      { dispatcher ! RepoAndAction(repo, commitAction) }
 
   }
 }

@@ -7,8 +7,9 @@ object GitDispatcher {
   def props(filesToWrite: Int): Props = Props(new GitDispatcher(filesToWrite))
 }
 class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
+
   def receive = {
-    case repo: Repo => {
+    case RepoAndAction( repo, commitAction ) => {
       //val email = "frasure"
       //val userEntries = repoLogs.logEntries.filter(_.author contains email )
 
@@ -25,7 +26,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       //commitParser ! HashesAndAction(HashList(userHashes), "createDeltas")
       
       //val commitAction = LineDeltas
-      val commitAction: CommitAction = FilesChanged
+      //val commitAction: CommitAction = FilesChanged
 
       commitParser ! commitAction
       plotFileCreator ! Plotter.createPlotScript(repo.fileName, commitAction.pp)
