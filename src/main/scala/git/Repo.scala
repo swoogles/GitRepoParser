@@ -5,6 +5,8 @@ import java.nio.file.Paths
 
 import com.billding.{Client, SubCommand}
 
+import scala.language.postfixOps
+
 case class Repo(path: Path, home: Path) extends Client {
   val program = Seq("git")
   val persistentArguments = Seq("--git-dir="+dir+".git")

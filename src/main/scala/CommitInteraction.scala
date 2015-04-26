@@ -6,6 +6,10 @@ import akka.actor.{ ActorLogging, Props, Actor }
 
 import com.billding.{Client, SubCommand}
 
+import scala.language.postfixOps
+
+import scala.language.implicitConversions
+
 sealed trait CommitAction
 object LineDeltas extends CommitAction
 object FilesChanged extends CommitAction

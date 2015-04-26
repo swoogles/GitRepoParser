@@ -13,5 +13,7 @@ libraryDependencies ++= Seq(
 
 org.scalastyle.sbt.ScalastylePlugin.Settings
 
+scalacOptions ++= Seq("-feature")
+
 mainClass := Some("GitManager")
 

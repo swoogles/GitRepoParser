@@ -4,6 +4,8 @@ import scala.sys.process._
 import scala.sys.process.Process
 import scala.sys.process.ProcessBuilder
 
+import scala.language.postfixOps
+
 trait Executable {
   def execute(arguments: Seq[String]): String = {
     arguments!!
@@ -31,9 +33,9 @@ trait Client extends ExecutableStandAlone{
   val program:Seq[String]
   val persistentArguments:Seq[String] 
 
-  override def execute(arguments: Seq[String]): String  = {
-    super.execute(program++persistentArguments++arguments)
-  }
+  //override def execute(arguments: Seq[String]): String  = {
+  //  super.execute(program++persistentArguments++arguments)
+  //}
 
 }
 
