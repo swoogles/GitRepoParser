@@ -12,17 +12,17 @@ case class GnuPlotter (
 ) {
 
   def createPlotScript(project:String) = {
-  val imageOutput = s"""
-    set term png
-    set output "images/$project.png"
-  """
+    val imageOutput = s"""
+      set term png
+      set output "images/$project.png"
+    """
 
     val plotSettings = s"""
-    set yzeroaxis
-    set ytics axis
-    set yrange [$yMin:$yMax]
+      set yzeroaxis
+      set ytics axis
+      set yrange [$yMin:$yMax]
 
-    set multiplot
+      set multiplot
     """
 
     val startCol = 2
@@ -47,24 +47,17 @@ case class GnuPlotter (
 
 object GnuPlotter extends Client{
   val program = Seq("gnuplot")
-  val persistentArguments = Seq("plotfiles/*")
+
+  val plotFileDirectory = Seq("plotfiles/*")
+
+  val persistentArguments = plotFileDirectory
 
   def plotColumn(project:String, column:Int, color:String):String = {
     "plot 'data/" + project + ".dat' using 1:" + column + " lt rgb \"" + color + "\" w line \n"
   }
 
   def executePlotScripts() = {
-    //val plotScriptDir = Seq("plotfiles/*")
-    println(s"fullCommand: ${fullCommand}")
-    //execute()//(plotScriptDir)
-    import scala.sys.process.Process
-    Process(Seq("bash", "-c", fullCommand.mkString(" "))).!!
-  }
-
-  def runFullCommandWithWildCards (arguments:Seq[String] )( implicit program:Seq[String]):String = {
-    import scala.sys.process.Process
-    val fullCommand = (program++arguments)
-    Process(Seq("bash", "-c", fullCommand.mkString(" "))).!!
+    execute()
   }
 
 }

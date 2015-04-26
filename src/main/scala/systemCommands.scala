@@ -8,7 +8,7 @@ import scala.language.postfixOps
 
 trait Executable {
   def execute(arguments: Seq[String]): String = {
-    arguments!!
+    Process(Seq("bash", "-c", arguments.mkString(" "))).!! // Wildcard-safe version
   }
 }
 
@@ -34,11 +34,6 @@ trait ExecutableStandAlone extends Executable{
 trait Client extends ExecutableStandAlone{
   val program:Seq[String]
   val persistentArguments:Seq[String] 
-
-  //override def execute(arguments: Seq[String]): String  = {
-  //  super.execute(program++persistentArguments++arguments)
-  //}
-
 }
 
 case class SubCommand(client: Client, subProgram: Seq[String], subPersistentArguments: Seq[String]) extends ExecutableStandAlone{
