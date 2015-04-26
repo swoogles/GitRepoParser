@@ -55,8 +55,6 @@ class CommitParser(repo: Repo) extends Actor with ActorLogging with Client{
   def getLinesDeleted(hash: GitHash):Int = getNumberWithPattern(hash, "deletions")
 
   def logFullCommit(gitHash: GitHash):String = {
-    val program = "show"
-
     sealed abstract class DisplayVariant {
       val parameter: Seq[String]
     }
@@ -64,7 +62,7 @@ class CommitParser(repo: Repo) extends Actor with ActorLogging with Client{
     case object SHORTSTAT extends DisplayVariant { val parameter = Seq("--shortstat") }
     case object ONELINE extends DisplayVariant { val parameter = Seq("--oneline") }
 
-    repo.logCommand.execute(ONELINE.parameter)
+    repo.logCommand.execute(Seq(gitHash.hash) ++ SHORTSTAT.parameter)
   }
 
   def createDeltas(hashes: List[GitHash]): List[CommitDelta] = {

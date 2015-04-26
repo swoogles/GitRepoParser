@@ -25,7 +25,7 @@ trait ExecutableStandAlone extends Executable{
   }
 
   def !!(): String = {
-    execute
+    execute(Nil)
   }
 }
 
