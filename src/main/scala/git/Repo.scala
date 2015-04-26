@@ -9,6 +9,8 @@ import com.billding.PlotProperties
 
 import scala.language.postfixOps
 
+import scala.util.{Success, Failure, Try}
+
 sealed trait RepoAction {
   val pp: PlotProperties
 }
@@ -24,6 +26,19 @@ object RepoAction {
     "FilesChanged" -> FilesChanged,
     "LineDeltas" -> LineDeltas
   )
+
+  def getAction(desiredAction: String): Try[RepoAction] = {
+    availableActions.get(desiredAction) match {
+      case Some(action) => Success(action)
+      case None => { 
+        val errorMsg = 
+        s""""\nBad Action: ${desiredAction}
+        Available Actions:${RepoAction.availableActions.keys.foldLeft("\t")(_ + "\n-" + _)}
+        """
+        Failure( new Exception(errorMsg) ) 
+    }
+    }
+  }
 }
 
 

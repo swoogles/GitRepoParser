@@ -2,6 +2,8 @@ package com.billding.git
 
 import akka.actor.{ ActorSystem, Actor}
 
+import scala.util.{Success, Failure, Try}
+
 case class RepoAndAction (
   repo: Repo, 
   repoAction: RepoAction
@@ -17,7 +19,7 @@ object GitManager {
     val email = cmdLineArgs(0)
     val actionParam = cmdLineArgs(1)
 
-    val chosenAction: Option[RepoAction] = RepoAction.availableActions.get(actionParam)
+    val chosenAction: Try[RepoAction] = RepoAction.getAction(actionParam)
 
     val repos = List(
       //"AtomicScala",
@@ -34,7 +36,7 @@ object GitManager {
 
 
     chosenAction match {
-      case Some(repoAction) => {
+      case Success(repoAction) => {
         val system = ActorSystem("helloakka")
         val numRepos = repos.size
         val filesPerRepo = 2
@@ -43,9 +45,8 @@ object GitManager {
 
         for { repo <- repos } { dispatcher ! RepoAndAction(repo, repoAction) }
       }
-      case None =>  {
-        println(s"\nBad Action: ${actionParam}")
-        println(s"\nAvailable Actions:${RepoAction.availableActions.keys.foldLeft("\t")(_ + "\n-" + _)}")
+      case Failure(exception) =>  {
+        println(exception.getMessage)
       }
     }
 
