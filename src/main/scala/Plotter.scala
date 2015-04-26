@@ -5,25 +5,12 @@ case class PlotScript(data:List[String])
 case class PlotProperties(
   yMax:Int = 500,
   yMin:Int = -500,
-  xMax:Int = 0,
-  xMin:Int = 0,
-  numCols:Int = 3,
-  filename: String = "blah.png"
+  numCols:Int = 3
 )
 
 case class GnuPlotter (
-  yMax:Int = 500,
-  yMin:Int = -500,
-  xMax:Int = 0,
-  xMin:Int = 0,
-  numCols:Int = 2,
-  filename: String = "programmatic.png",
   pp: PlotProperties = PlotProperties()
 ) {
-
-  def createDynamicPlotFile(pp: PlotProperties) = {
-
-  }
 
   def createPlotScript(project:String) = {
     val imageOutput = s"""
@@ -34,7 +21,7 @@ case class GnuPlotter (
     val plotSettings = s"""
       set yzeroaxis
       set ytics axis
-      set yrange [$yMin:$yMax]
+      set yrange [${pp.yMin}:${pp.yMax}]
 
       set multiplot
     """
