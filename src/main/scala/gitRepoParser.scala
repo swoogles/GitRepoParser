@@ -10,15 +10,15 @@ object GitManager {
     val email = args(0)
 
     val repos = List(
-      "AtomicScala",
-      "AudioHand/Mixer",
+      //"AtomicScala",
+      //"AudioHand/Mixer",
       "ClashOfClans",
       "ConcurrencyInAction",
       "GitRepoParser",
       "Latex",
-      "Personal",
-      "Physics",
-      "ProjectEuler",
+      //"Personal",
+      //"Physics",
+      //"ProjectEuler",
       "RoundToNearestX"
     ) map {  x => Repo("Repositories/" + x , home) }
 

@@ -55,7 +55,16 @@ object GnuPlotter extends Client{
 
   def executePlotScripts() = {
     //val plotScriptDir = Seq("plotfiles/*")
-    execute()//(plotScriptDir)
+    println(s"fullCommand: ${fullCommand}")
+    //execute()//(plotScriptDir)
+    import scala.sys.process.Process
+    Process(Seq("bash", "-c", fullCommand.mkString(" "))).!!
+  }
+
+  def runFullCommandWithWildCards (arguments:Seq[String] )( implicit program:Seq[String]):String = {
+    import scala.sys.process.Process
+    val fullCommand = (program++arguments)
+    Process(Seq("bash", "-c", fullCommand.mkString(" "))).!!
   }
 
 }
