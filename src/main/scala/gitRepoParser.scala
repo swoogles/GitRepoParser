@@ -13,17 +13,14 @@ object GitManager {
   def main(args: Array[String]) = 
   {
     val email = args(0).split("\\s+")(0)
-    println(s"email: ${email}")
-    val action = args(0).split("\\s+")(1)
-    println(s"action: ${action}") 
+    val actionParam = args(0).split("\\s+")(1)
 
     val availableActions = Map(
-      "filesChanged" -> FilesChanged,
-    "LineDeltas" -> LineDeltas
+      "FilesChanged" -> FilesChanged,
+      "LineDeltas" -> LineDeltas
   )
 
-    val chosenAction: Option[CommitAction] = availableActions.get(action)
-    println(s"chosenAction: ${chosenAction}")
+    val chosenAction: Option[CommitAction] = availableActions.get(actionParam)
 
     val repos = List(
       //"AtomicScala",
@@ -39,8 +36,6 @@ object GitManager {
   ) map {  x => Repo("Repositories/" + x , home) }
 
 
-    //val commitAction: CommitAction = FilesChanged
-
     chosenAction match {
       case Some(commitAction) => {
         val system = ActorSystem("helloakka")
@@ -52,7 +47,9 @@ object GitManager {
         { dispatcher ! RepoAndAction(repo, commitAction) }
       }
       case None =>  {
-        println("Bad Action. I'm not taking another step.")
+        println(s"\nBad Action: ${actionParam}")
+        //println(s"Available Actions:\n${availableActions.keys.mkString("\n")}")
+        println(s"\nAvailable Actions:${availableActions.keys.foldLeft("\t")(_ + "\n-" + _)}")
       }
     }
 

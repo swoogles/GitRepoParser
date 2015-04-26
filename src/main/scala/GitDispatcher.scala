@@ -10,10 +10,9 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
 
   def receive = {
     case RepoAndAction( repo, commitAction ) => {
-      //val email = "frasure"
       //val userEntries = repoLogs.logEntries.filter(_.author contains email )
-
       //val userHashes = userEntries.map(x=>GitHash(x.commit))
+      
       val commitParser = context.actorOf(CommitParser.props(repo), repo.fileName + "commitParser")
 
       val plotFileCreator = context.actorOf(GitDataFileCreator.props(repo), repo.fileName + "plotFileCreator")
