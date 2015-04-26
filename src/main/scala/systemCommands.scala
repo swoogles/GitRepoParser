@@ -27,6 +27,8 @@ trait ExecutableStandAlone extends Executable{
   def !!(): String = {
     execute(Nil)
   }
+
+  def fullCommand(): Seq[String] = program ++ persistentArguments
 }
 
 trait Client extends ExecutableStandAlone{
