@@ -8,11 +8,22 @@ case class PlotProperties(
   numCols:Int = 1
 )
 
-case class Plotter (
-  pp: PlotProperties = PlotProperties()
-) {
+object Plotter extends Client{
+  val program = Seq("gnuplot")
 
-  def createPlotScript(project:String) = {
+  val plotFileDirectory = Seq("plotfiles/*")
+
+  val persistentArguments = plotFileDirectory
+
+  def plotColumn(project:String, column:Int, color:String):String = {
+    "plot 'data/" + project + ".dat' using 1:" + column + " lt rgb \"" + color + "\" w line \n"
+  }
+
+  def executePlotScripts() = {
+    execute()
+  }
+
+  def createPlotScript(project:String, pp: PlotProperties) = {
     val imageOutput = s"""
       set term png
       set output "images/$project.png"
@@ -48,22 +59,6 @@ case class Plotter (
 
     val plotScriptData = List(imageOutput + plotSettings + totalPlotsReal.reduce(_ + "\n" + _) + endPlotSettings)
     PlotScript(plotScriptData)
-  }
-}
-
-object Plotter extends Client{
-  val program = Seq("gnuplot")
-
-  val plotFileDirectory = Seq("plotfiles/*")
-
-  val persistentArguments = plotFileDirectory
-
-  def plotColumn(project:String, column:Int, color:String):String = {
-    "plot 'data/" + project + ".dat' using 1:" + column + " lt rgb \"" + color + "\" w line \n"
-  }
-
-  def executePlotScripts() = {
-    execute()
   }
 
 }
