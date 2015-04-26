@@ -24,7 +24,7 @@ class CommitParser(repo: Repo) extends Actor with ActorLogging with Client{
         sender ! DataFile(repo, createDeltas(repo.hashes))
     }
     case FilesChanged => {
-        sender ! DataFile(repo, createDeltas(repo.hashes))
+        sender ! DataFile(repo, createFileNumberDeltas(repo.hashes))
     }
   }
 
@@ -77,6 +77,18 @@ class CommitParser(repo: Repo) extends Actor with ActorLogging with Client{
     }
     commitDeltas
   }
+
+  def createFileNumberDeltas(hashes: List[GitHash]): List[CommitFileNumberDelta] = {
+    val commitDeltas: List[CommitFileNumberDelta] = hashes.zipWithIndex map {
+      case (hash,idx) => {
+        CommitFileNumberDelta(
+          idx, 
+          getFilesChanged(hash)
+        )
+      } 
+    }
+    commitDeltas
+  }
 }
 
 case class CommitDelta(idx: Long, linesAdded: Long, linesDeleted: Long)
@@ -86,5 +98,14 @@ case class CommitDelta(idx: Long, linesAdded: Long, linesDeleted: Long)
 object CommitDelta {
   implicit def stringifier(cd: CommitDelta): String = cd.toString
   implicit def multiStringifier(cds: List[CommitDelta]): List[String] = cds map { cd => cd.toString }
+}
+
+case class CommitFileNumberDelta(idx: Long, filesChanged: Long)
+{
+  override def toString(): String = s"$idx $filesChanged"
+}
+object CommitFileNumberDelta {
+  implicit def stringifier(cd: CommitFileNumberDelta): String = cd.toString
+  implicit def multiStringifier(cds: List[CommitFileNumberDelta]): List[String] = cds map { cd => cd.toString }
 }
 

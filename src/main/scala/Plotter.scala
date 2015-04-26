@@ -3,9 +3,9 @@ package com.billding
 case class PlotScript(data:List[String])
 
 case class PlotProperties(
-  yMax:Int = 500,
-  yMin:Int = -500,
-  numCols:Int = 2
+  yMax:Int = 10,
+  yMin:Int = 0,
+  numCols:Int = 1
 )
 
 case class Plotter (
