@@ -1,6 +1,6 @@
 package com.billding.git
 
-import com.billding.GnuPlotter
+import com.billding.Plotter
 import akka.actor.{ ActorLogging, ActorRef, ActorSystem, Props, Actor }
 
 object GitDispatcher {
@@ -25,7 +25,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       //commitParser ! HashesAndAction(HashList(userHashes), "createDeltas")
       commitParser ! LineDeltas
 
-      val plotter = new GnuPlotter
+      val plotter = new Plotter
 
       plotFileCreator ! plotter.createPlotScript(repo.fileName)
     }
@@ -42,7 +42,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       println(s"RepoName: $repoName")
       if ( filesToWrite == 0 ) {
         context.system.shutdown()
-        GnuPlotter.executePlotScripts()
+        Plotter.executePlotScripts()
       }
     }
   }

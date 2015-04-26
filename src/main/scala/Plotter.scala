@@ -5,10 +5,10 @@ case class PlotScript(data:List[String])
 case class PlotProperties(
   yMax:Int = 500,
   yMin:Int = -500,
-  numCols:Int = 3
+  numCols:Int = 2
 )
 
-case class GnuPlotter (
+case class Plotter (
   pp: PlotProperties = PlotProperties()
 ) {
 
@@ -39,7 +39,7 @@ case class GnuPlotter (
     val colsAndColors = colRange zip colors 
     println(s"colsAndColors: ${colsAndColors}")
 
-    val totalPlotsReal = colsAndColors map{ entry => GnuPlotter.plotColumn(project, entry._1, entry._2) } 
+    val totalPlotsReal = colsAndColors map{ entry => Plotter.plotColumn(project, entry._1, entry._2) } 
 
     //println(s"totalPlotsReal: ${totalPlotsReal.reduce(_ + "\n" + _)}")
 
@@ -51,7 +51,7 @@ case class GnuPlotter (
   }
 }
 
-object GnuPlotter extends Client{
+object Plotter extends Client{
   val program = Seq("gnuplot")
 
   val plotFileDirectory = Seq("plotfiles/*")
