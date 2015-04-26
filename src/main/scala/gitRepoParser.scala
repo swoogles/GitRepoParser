@@ -12,8 +12,10 @@ object GitManager {
 
   def main(args: Array[String]) = 
   {
-    val email = args(0).split("\\s+")(0)
-    val actionParam = args(0).split("\\s+")(1)
+    val cmdLineArgs: Array[String] = args(0).split("\\s+")
+
+    val email = cmdLineArgs(0)
+    val actionParam = cmdLineArgs(1)
 
     val chosenAction: Option[RepoAction] = RepoAction.availableActions.get(actionParam)
 
