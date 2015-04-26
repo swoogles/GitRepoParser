@@ -23,10 +23,13 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       //commitParser ! HashList(userHashes)
 
       //commitParser ! HashesAndAction(HashList(userHashes), "createDeltas")
-      //commitParser ! LineDeltas
-      commitParser ! FilesChanged
+      
+      commitParser ! LineDeltas
+      val pp = com.billding.PlotProperties(500, -500, 2)
+      
+      //commitParser ! FilesChanged
+      //val pp = com.billding.PlotProperties(15, 0, 1)
 
-      val pp = com.billding.PlotProperties(15, 0, 1)
       plotFileCreator ! Plotter.createPlotScript(repo.fileName, pp)
     }
     case dataFile: DataFile => {
