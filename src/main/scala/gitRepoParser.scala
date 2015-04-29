@@ -32,7 +32,7 @@ object GitManager {
     //"Physics",
     //"ProjectEuler",
     "RoundToNearestX"
-  ) map {  x => Repo("Repositories/" + x , home) }
+  ) map {  x => Repo(home + "Repositories/" + x) }
 
 
     chosenAction match {

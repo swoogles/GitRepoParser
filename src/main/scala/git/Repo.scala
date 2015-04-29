@@ -43,7 +43,7 @@ object RepoAction {
 }
 
 
-case class Repo(path: Path, home: Path) extends Client {
+case class Repo(path: Path) extends Client {
   val program = Seq("git")
   val persistentArguments = Seq("--git-dir="+dir+".git")
 
@@ -51,7 +51,7 @@ case class Repo(path: Path, home: Path) extends Client {
     path.toString.replaceAll("/","_")
   }
   def dir(): String = {
-    home + "/" + path.toString + "/"
+    path.toString + "/"
   }
 
   def firstWord(x: String) = x.split("\\s")(0)
@@ -79,7 +79,7 @@ case class Repo(path: Path, home: Path) extends Client {
 } 
 
 object Repo {
-  def apply(pathString: String, homeString: String): Repo = {
-    Repo( Paths.get(pathString), Paths.get(homeString))
+  def apply(pathString: String): Repo = {
+    Repo(Paths.get(pathString))
   }
 }
