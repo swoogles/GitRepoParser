@@ -23,6 +23,9 @@ class CommitParser(repoParam: Repo) extends Actor with ActorLogging with RepoFun
     case FilesChanged => {
         sender ! DataFile(repo, createFileNumberDeltas(repo.hashes))
     }
+    case FollowFiles => {
+        sender ! DataFile(repo, createFileNumberDeltas(repo.hashes))
+    }
   }
 }
 

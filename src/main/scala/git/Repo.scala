@@ -20,6 +20,9 @@ object LineDeltas extends RepoAction {
 object FilesChanged extends RepoAction {
   val pp = PlotProperties(15, 0, 1)
 }
+object FollowFiles extends RepoAction {
+  val pp = PlotProperties(15, 0, 1)
+}
       
 object RepoAction {
   val availableActions = Map[String, RepoAction](
