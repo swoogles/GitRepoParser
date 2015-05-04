@@ -3,13 +3,13 @@
   multiple repositories.
 
   Since then, a few separate pieces have started to form:
-##Executable 
+- **Executable** 
   Give this class a program and parameters that it should execute on the command line
-##Client 
+- **Client**
   Has an immutable program and default parameters, and allows you to execute commands with additional paramters
-##Repo 
+- **Repo**
   Client that allows you to run various advanced command sequences on a Git repository
-##GitDispatcher
+- **GitDispatcher**
   Manages the different jobs that need to take place for the whole sequence to complete.
   
 Currently, the project aims to give the user a handful of complex actions that will analyze their repos and give them useful graphs to view.
