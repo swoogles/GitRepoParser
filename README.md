@@ -1,6 +1,8 @@
 #Overview:
-  This project started when I wanted to run some git command via scala on
-  multiple repositories.
+  This project started when I wanted to run some git command on multiple 
+  repositories. Since I was learning Scala at the time, I decided to use 
+  it as the scripting language to link together a handful of external 
+  commands.
 
   Since then, a few separate pieces have started to form:
 - **Executable** 
@@ -17,6 +19,7 @@ Currently, the project aims to give the user a handful of complex actions that w
 #Interesting/Novel Technologies Used:
   - Akka Actors
   - Scala External Commands
+  - Creating GnuPlot scripts via code
 
 #New Concepts:
   - Designing reusable Client traits
@@ -28,3 +31,4 @@ Currently, the project aims to give the user a handful of complex actions that w
   are using them.
 - Restricting communication between actors to defined classes/objects has
   forced me to design better APIs 
+- Sometimes override behavior hasn't been matching my expectations. I'm not sure if this is a flaw in my own understanding or actual holes in the compiler. I will try to capture some examples next time I encounter it.
