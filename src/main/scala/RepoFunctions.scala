@@ -12,13 +12,15 @@ import com.billding.plotting.DataPlottable
 trait RepoFunctions extends Client{ self =>
   def repo: Repo
   val program = Seq("git")
-  def persistentArguments = Seq("--git-dir=" + repo.path.toString + ".git", "--work-tree=" + repo.path.toString)
+  def persistentArguments = Seq("--git-dir=" + repo.path.toString + "/.git", "--work-tree=" + repo.path.toString)
 
   val showCommand = SubCommand(program, persistentArguments,"show")
   val todayCommand = SubCommand(program, persistentArguments,"today")
   val branchCommand = SubCommand(program, persistentArguments,"branch")
   val statusCommand = SubCommand(program, persistentArguments,"status")
   def status = statusCommand.execute()
+
+  val lsFilesCommand = SubCommand(program, persistentArguments,"ls-files")
 
   def getFirstNum(wordsString:String):Int = {
     val words = wordsString split("\\s+")

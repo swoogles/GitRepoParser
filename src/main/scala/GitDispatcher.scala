@@ -14,6 +14,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
     case RepoAndAction( repo: Repo, commitAction ) => {
       val repoActorId: String = generateRepoActorId(repo)
 
+      println("ah!")
       val commitParser = context.actorOf(CommitParser.props(repo), repoActorId + "commitParser")
       val plotFileCreator = context.actorOf(GitDataFileCreator.props(repo), repoActorId + "plotFileCreator")
 
