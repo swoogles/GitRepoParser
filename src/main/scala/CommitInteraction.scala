@@ -15,9 +15,7 @@ import com.billding.plotting.DataPlottable
 object CommitParser {
   def props(repo: Repo): Props = Props(new CommitParser(repo))
 }
-class CommitParser(repoParam: Repo) extends Actor with ActorLogging with RepoFunctions{
-  override def repo: Repo = repoParam
-
+class CommitParser(val repo: Repo) extends Actor with ActorLogging with RepoFunctions{
   def receive = {
     case LineDeltas => {
         sender ! DataFile(repo, createDeltas(repo.hashes))
