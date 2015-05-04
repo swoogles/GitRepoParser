@@ -12,7 +12,7 @@ import com.billding.plotting.DataPlottable
 trait RepoFunctions extends Client{ self =>
   def repo: Repo
   val program = Seq("git")
-  def persistentArguments = Seq("--git-dir=" + repo.path.toString + "/.git", "--work-tree=" + repo.path.toString)
+  def persistentArguments = Seq(s"--git-dir=${repo.path.toString}/.git", s"--work-tree=${repo.path.toString}")
 
   val showCommand = SubCommand(program, persistentArguments,"show")
   val todayCommand = SubCommand(program, persistentArguments,"today")
