@@ -7,6 +7,8 @@ import util.matching.Regex
 import scala.language.postfixOps
 import scala.language.implicitConversions
 
+import com.billding.plotting.DataPlottable
+
 trait RepoFunctions extends Client{ self =>
   def repo: Repo
   val program = Seq("git")
@@ -52,14 +54,14 @@ trait RepoFunctions extends Client{ self =>
     repo.logCommand.execute(Seq(gitHash.hash) ++ SHORTSTAT.parameter)
   }
 
-  def createDeltas(hashes: List[GitHash]): List[CommitDelta] = {
+  def createDeltas(hashes: List[GitHash]): List[DataPlottable] = {
     val commitDeltas: List[CommitDelta] = hashes.zipWithIndex map {
       case (hash,idx) => CommitDelta( idx, getLinesAdded(hash), -getLinesDeleted(hash))
     }
     commitDeltas
   }
 
-  def createFileNumberDeltas(hashes: List[GitHash]): List[CommitFileNumberDelta] = {
+  def createFileNumberDeltas(hashes: List[GitHash]): List[DataPlottable] = {
     val commitDeltas: List[CommitFileNumberDelta] = hashes.zipWithIndex map {
       case (hash,idx) => CommitFileNumberDelta( idx, getFilesChanged(hash)) 
     }
