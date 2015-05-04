@@ -8,14 +8,14 @@ object GitDispatcher {
 }
 
 class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
+  def generateRepoActorId(repo: Repo): String = repo.path.toString.replace("/","_")
 
   def receive = {
     case RepoAndAction( repo: Repo, commitAction ) => {
+      val repoActorId: String = generateRepoActorId(repo)
 
-      println("about to make actor with string : " + repo.path.toString.replace("/","_"))
-
-      val commitParser = context.actorOf(CommitParser.props(repo), repo.path.toString.replace("/","_") + "commitParser")
-      val plotFileCreator = context.actorOf(GitDataFileCreator.props(repo), repo.path.toString.replace("/","_") + "plotFileCreator")
+      val commitParser = context.actorOf(CommitParser.props(repo), repoActorId + "commitParser")
+      val plotFileCreator = context.actorOf(GitDataFileCreator.props(repo), repoActorId + "plotFileCreator")
 
       // After parser does its work, it should tell the results to dataFileCreator
       // I'm sure there's a more proper way where dataFileCreator is already the
@@ -24,7 +24,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       plotFileCreator ! Plotter.createPlotScript(repo.fileName, commitAction.pp)
     }
     case dataFile: DataFile => {
-      val dataFileCreator: ActorRef = context.actorOf(GitDataFileCreator.props(dataFile.repo), dataFile.repo.path.toString.replace("/","_") + "dataFileCreator")
+      val dataFileCreator: ActorRef = context.actorOf(GitDataFileCreator.props(dataFile.repo), generateRepoActorId(dataFile.repo) + "dataFileCreator")
       dataFileCreator ! dataFile
     }
 
