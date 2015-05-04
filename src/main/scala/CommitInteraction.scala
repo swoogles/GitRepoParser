@@ -13,7 +13,8 @@ import scala.language.implicitConversions
 object CommitParser {
   def props(repo: Repo): Props = Props(new CommitParser(repo))
 }
-class CommitParser(repo: Repo) extends Actor with ActorLogging with Client{
+class CommitParser(repoParam: Repo) extends Actor with ActorLogging with RepoFunctions{
+  override def repo: Repo = repoParam
 
   def receive = {
     case LineDeltas => {
@@ -22,68 +23,6 @@ class CommitParser(repo: Repo) extends Actor with ActorLogging with Client{
     case FilesChanged => {
         sender ! DataFile(repo, createFileNumberDeltas(repo.hashes))
     }
-  }
-
-  val program = Seq("git")
-  val persistentArguments = Seq("--git-dir=" + repo.dir + ".git", "--work-tree=" + repo.dir)
-
-  def getFirstNum(wordsString:String):Int = {
-    val words = wordsString split("\\s+")
-    words(0).toInt
-  }
-
-  def getNumberWithPattern(hash: GitHash, pattern: Regex ):Int = {
-    val commitInfo = logFullCommit(hash)
-    val combinedRegex = ("\\d+ " + pattern.toString).r
-    val matchingStrings = combinedRegex findAllIn commitInfo
-    if (matchingStrings nonEmpty)
-      getFirstNum(matchingStrings next) 
-    else
-      0
-  }
-
-  implicit def stringToRegex(patternString: String): Regex = {
-    patternString.r
-  }
-
-  def getFilesChanged(hash: GitHash):Int = getNumberWithPattern(hash, "files? changed")
-  def getLinesAdded(hash: GitHash):Int = getNumberWithPattern(hash, "insertions")
-  def getLinesDeleted(hash: GitHash):Int = getNumberWithPattern(hash, "deletions")
-
-  def logFullCommit(gitHash: GitHash):String = {
-    sealed abstract class DisplayVariant {
-      val parameter: Seq[String]
-    }
-    case object NUMSTAT extends DisplayVariant { val parameter = Seq("--numstat") }
-    case object SHORTSTAT extends DisplayVariant { val parameter = Seq("--shortstat") }
-    case object ONELINE extends DisplayVariant { val parameter = Seq("--oneline") }
-
-    repo.logCommand.execute(Seq(gitHash.hash) ++ SHORTSTAT.parameter)
-  }
-
-  def createDeltas(hashes: List[GitHash]): List[CommitDelta] = {
-    val commitDeltas: List[CommitDelta] = hashes.zipWithIndex map {
-      case (hash,idx) => {
-        CommitDelta(
-          idx, 
-          getLinesAdded(hash),
-          -getLinesDeleted(hash)
-        )
-      } 
-    }
-    commitDeltas
-  }
-
-  def createFileNumberDeltas(hashes: List[GitHash]): List[CommitFileNumberDelta] = {
-    val commitDeltas: List[CommitFileNumberDelta] = hashes.zipWithIndex map {
-      case (hash,idx) => {
-        CommitFileNumberDelta(
-          idx, 
-          getFilesChanged(hash)
-        )
-      } 
-    }
-    commitDeltas
   }
 }
 
