@@ -3,20 +3,33 @@ package com.billding.git
 import com.billding.Utility
 import com.billding.DataWriter
 import com.billding.PlotScript
-
-import akka.actor.{ ActorLogging, Props, Actor }
-
+import akka.actor.{Actor, ActorLogging, Props}
+import ammonite.ops.Path
 import com.billding.plotting.DataPlottable
+import ammonite.ops.mkdir
 
 case class DataFile(repo: Repo, data:List[DataPlottable]) {
   val dataStrings = data map { datum => datum.dataString }
 }
 
+case class OutputDirectories(baseDir: Path) {
+  val plotFiles = baseDir / "plotfiles"
+  val dataFiles = baseDir / "data"
+  val images = baseDir / "images"
+  def initialize() = {
+    mkdir! plotFiles
+    mkdir! dataFiles
+    mkdir! images
+  }
+}
+
 object GitDataFileCreator {
-  def props(repo: Repo): Props = Props(new GitDataFileCreator(repo))
+  val tmpOutputDirs = OutputDirectories(Path("/tmp/GitRepoParser"))
+  def props(repo: Repo, outputDirs: OutputDirectories = GitDataFileCreator.tmpOutputDirs): Props = Props(new GitDataFileCreator(repo, baseDir))
 }
 class GitDataFileCreator(
-  repo: Repo
+  repo: Repo,
+  val outputDirs: OutputDirectories
 ) extends Actor with ActorLogging
 {
   def receive = {
@@ -34,13 +47,13 @@ class GitDataFileCreator(
   val utility: Utility = new Utility
 
   def writePlotScript(data:List[String]) = {
-    val plotScriptName = "plotfiles/" + repo.fileName + ".gnuplot"
-    dataWriter.write(data, plotScriptName, utility)
+    val plotScript = outputDirs.plotFiles / (repo.fileName + ".gnuplot")
+    dataWriter.write(data, plotScript, utility)
   }
 
   def writeDataFile(data:List[String]) = {
-    val dataFileName = "data/" + repo.fileName +".dat" 
-    dataWriter.write(data, dataFileName, utility)
+    val dataFile = outputDirs.dataFiles / repo.fileName +".dat"
+    dataWriter.write(data, dataFile, utility)
   }
 }
 

@@ -8,21 +8,26 @@ object GitDispatcher {
 }
 
 class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
+
+  import ammonite.ops.Path
+
+  val tmpBaseDir = Path("/tmp/GitRepoParser")
+  val outputDirs = OutputDirectories(tmpBaseDir)
+  val plotter = new Plotter(tmpBaseDir)
   def generateRepoActorId(repo: Repo): String = repo.path.toString.replace("/","_")
 
   def receive = {
     case RepoAndAction( repo: Repo, commitAction ) => {
       val repoActorId: String = generateRepoActorId(repo)
 
-      println("ah!")
       val commitParser = context.actorOf(CommitParser.props(repo), repoActorId + "commitParser")
-      val plotFileCreator = context.actorOf(GitDataFileCreator.props(repo), repoActorId + "plotFileCreator")
+      val plotFileCreator = context.actorOf(GitDataFileCreator.props(repo, tmpBaseDir), repoActorId + "plotFileCreator")
 
       // After parser does its work, it should tell the results to dataFileCreator
       // I'm sure there's a more proper way where dataFileCreator is already the
       // sender, but this will have to do for now.
       commitParser ! commitAction
-      plotFileCreator ! Plotter.createPlotScript(repo.fileName, commitAction.pp)
+      plotFileCreator ! plotter.createPlotScript(repo.fileName, commitAction.pp)
     }
     case dataFile: DataFile => {
       val dataFileCreator: ActorRef = context.actorOf(GitDataFileCreator.props(dataFile.repo), generateRepoActorId(dataFile.repo) + "dataFileCreator")
@@ -35,7 +40,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       val repoName: String = s"actor $sender".split("_")(1).split("#")(0) // Get everything after the first underscore and then before the following #
       if ( filesToWrite == 0 ) {
         context.system.shutdown()
-        Plotter.executePlotScripts()
+        plotter.executePlotScripts()
       }
     }
   }

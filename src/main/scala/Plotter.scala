@@ -1,5 +1,7 @@
 package com.billding
 
+import ammonite.ops.{Path, mkdir}
+
 case class PlotScript(data:List[String])
 
 case class PlotProperties(
@@ -8,15 +10,20 @@ case class PlotProperties(
   numCols:Int = 1
 )
 
-object Plotter extends Client{
+class Plotter(val baseDir: Path) extends Client{
   val program = Seq("gnuplot")
 
-  val plotFileDirectory = Seq("plotfiles/*")
+//  val plotFileDirectory = Seq("plotfiles/*")
 
-  val persistentArguments = plotFileDirectory
+
+  val imgDir = baseDir / "images"
+  mkdir! imgDir
+  val dataDir = baseDir / "data"
+  val plotFileDir = baseDir / "plotfiles"
+  val persistentArguments = Seq(plotFileDir + "/*")
 
   def plotColumn(project:String, column:Int, color:String):String = {
-    "plot 'data/" + project + ".dat' using 1:" + column + " lt rgb \"" + color + "\" w line \n"
+    s"plot '$dataDir/" + project + ".dat' using 1:" + column + " lt rgb \"" + color + "\" w line \n"
   }
 
   def executePlotScripts() = {
@@ -24,9 +31,11 @@ object Plotter extends Client{
   }
 
   def createPlotScript(project:String, pp: PlotProperties) = {
+    val outputImg = imgDir / (project + ".png")
+    // TODO use new Path for images
     val imageOutput = s"""
       set term png
-      set output "images/$project.png"
+      set output "$outputImg"
     """
 
     val plotSettings = s"""
@@ -43,7 +52,7 @@ object Plotter extends Client{
 
     val colsAndColors = colRange zip colors 
 
-    val totalPlotsReal = colsAndColors map{ entry => Plotter.plotColumn(project, entry._1, entry._2) } 
+    val totalPlotsReal = colsAndColors map{ entry => plotColumn(project, entry._1, entry._2) }
 
     val endPlotSettings = """unset multiplot"""
 

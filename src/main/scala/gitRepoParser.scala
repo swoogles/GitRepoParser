@@ -24,14 +24,14 @@ object GitManager {
     val repos = List(
       //"AtomicScala",
     //"AudioHand/Mixer",
-    "ClashOfClans",
-    "ConcurrencyInAction",
+//    "ClashOfClans",
+//    "ConcurrencyInAction",
     "GitRepoParser",
-    "Latex",
-    //"Personal",
+//    "Latex",
+    "Personal"
     //"Physics",
     //"ProjectEuler",
-    "RoundToNearestX"
+//    "RoundToNearestX"
   ) map {  x => Repo(home + "Repositories/" + x) }
 
 
