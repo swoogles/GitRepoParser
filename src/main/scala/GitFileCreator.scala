@@ -16,16 +16,25 @@ case class OutputDirectories(baseDir: Path) {
   val plotFiles = baseDir / "plotfiles"
   val dataFiles = baseDir / "data"
   val images = baseDir / "images"
-  def initialize() = {
-    mkdir! plotFiles
-    mkdir! dataFiles
-    mkdir! images
+}
+
+object OutputDirectories {
+  def initialized(baseDir: Path) = {
+    val dirs = OutputDirectories(baseDir)
+    initialize(dirs)
+    dirs
+  }
+
+  private def initialize(x: OutputDirectories) = {
+    mkdir! x.plotFiles
+    mkdir! x.dataFiles
+    mkdir! x.images
   }
 }
 
 object GitDataFileCreator {
   val tmpOutputDirs = OutputDirectories(Path("/tmp/GitRepoParser"))
-  def props(repo: Repo, outputDirs: OutputDirectories = GitDataFileCreator.tmpOutputDirs): Props = Props(new GitDataFileCreator(repo, baseDir))
+  def props(repo: Repo, outputDirs: OutputDirectories = GitDataFileCreator.tmpOutputDirs): Props = Props(new GitDataFileCreator(repo, tmpOutputDirs))
 }
 class GitDataFileCreator(
   repo: Repo,

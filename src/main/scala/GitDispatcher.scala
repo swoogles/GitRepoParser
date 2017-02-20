@@ -12,8 +12,8 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
   import ammonite.ops.Path
 
   val tmpBaseDir = Path("/tmp/GitRepoParser")
-  val outputDirs = OutputDirectories(tmpBaseDir)
-  val plotter = new Plotter(tmpBaseDir)
+  val outputDirs = OutputDirectories.initialized(tmpBaseDir)
+  val plotter = new Plotter(outputDirs)
   def generateRepoActorId(repo: Repo): String = repo.path.toString.replace("/","_")
 
   def receive = {
@@ -21,7 +21,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       val repoActorId: String = generateRepoActorId(repo)
 
       val commitParser = context.actorOf(CommitParser.props(repo), repoActorId + "commitParser")
-      val plotFileCreator = context.actorOf(GitDataFileCreator.props(repo, tmpBaseDir), repoActorId + "plotFileCreator")
+      val plotFileCreator = context.actorOf(GitDataFileCreator.props(repo, outputDirs), repoActorId + "plotFileCreator")
 
       // After parser does its work, it should tell the results to dataFileCreator
       // I'm sure there's a more proper way where dataFileCreator is already the
