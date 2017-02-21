@@ -30,7 +30,7 @@ class GitDispatcher(var filesToWrite: Int) extends Actor with ActorLogging {
       plotFileCreator ! plotter.createPlotScript(repo.fileName, commitAction.pp)
     }
     case dataFile: DataFile => {
-      val dataFileCreator: ActorRef = context.actorOf(GitDataFileCreator.props(dataFile.repo), generateRepoActorId(dataFile.repo) + "dataFileCreator")
+      val dataFileCreator: ActorRef = context.actorOf(GitDataFileCreator.props(dataFile.repo, outputDirs), generateRepoActorId(dataFile.repo) + "dataFileCreator")
       dataFileCreator ! dataFile
     }
 

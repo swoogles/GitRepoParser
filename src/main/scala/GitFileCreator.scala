@@ -33,8 +33,7 @@ object OutputDirectories {
 }
 
 object GitDataFileCreator {
-  val tmpOutputDirs = OutputDirectories(Path("/tmp/GitRepoParser"))
-  def props(repo: Repo, outputDirs: OutputDirectories = GitDataFileCreator.tmpOutputDirs): Props = Props(new GitDataFileCreator(repo, tmpOutputDirs))
+  def props(repo: Repo, outputDirs: OutputDirectories): Props = Props(new GitDataFileCreator(repo, outputDirs))
 }
 class GitDataFileCreator(
   repo: Repo,

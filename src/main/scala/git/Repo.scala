@@ -78,4 +78,7 @@ object Repo {
   def apply(pathString: String): Repo = {
     Repo(Paths.get(pathString))
   }
+  def apply(path: ammonite.ops.Path): Repo = {
+    Repo(path.toNIO)
+  }
 }

@@ -1,8 +1,9 @@
 package com.billding.git
 
-import akka.actor.{ ActorSystem, Actor}
+import akka.actor.{Actor, ActorSystem}
+import ammonite.ops.Path
 
-import scala.util.{Success, Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 case class RepoAndAction (
   repo: Repo, 
@@ -11,6 +12,12 @@ case class RepoAndAction (
 
 object GitManager {
   val home = "/home/bfrasure/"
+
+  def analyzeRepo(targetRepo: Path, action: String) = {
+    val chosenAction: Try[RepoAction] = RepoAction.getAction(action)
+    val repo = Repo(targetRepo)
+    perform(chosenAction, List(repo))
+  }
 
   def main(args: Array[String]) = 
   {
@@ -35,6 +42,10 @@ object GitManager {
   ) map {  x => Repo(home + "Repositories/" + x) }
 
 
+    perform(chosenAction, repos)
+  }
+
+  private def perform(chosenAction: Try[RepoAction], repos: List[Repo] ) = {
     chosenAction match {
       case Success(repoAction) => {
         val system = ActorSystem("helloakka")
@@ -43,12 +54,13 @@ object GitManager {
         val filesToWrite = numRepos * filesPerRepo
         val dispatcher = system.actorOf(GitDispatcher.props(filesToWrite), "dispatcher")
 
-        for { repo <- repos } { dispatcher ! RepoAndAction(repo, repoAction) }
+        for {repo <- repos} {
+          dispatcher ! RepoAndAction(repo, repoAction)
+        }
       }
-      case Failure(exception) =>  {
+      case Failure(exception) => {
         println(exception.getMessage)
       }
     }
-
   }
 }
