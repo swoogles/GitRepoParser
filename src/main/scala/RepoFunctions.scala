@@ -41,9 +41,23 @@ trait RepoFunctions extends Client{ self =>
     patternString.r
   }
 
-  def getFilesChanged(hash: GitHash):Int = getNumberWithPattern(hash, "files? changed")
-  def getLinesAdded(hash: GitHash):Int = getNumberWithPattern(hash, "insertions")
-  def getLinesDeleted(hash: GitHash):Int = getNumberWithPattern(hash, "deletions")
+  case class CommitMetaData(hash: GitHash) {
+    val shortStatInfo = logFullCommit(hash)
+
+    def getNumberWithPatternFromShortStat(commitInfo: String, pattern: Regex ):Int = {
+      val combinedRegex = ("\\d+ " + pattern.toString).r
+      val matchingStrings = combinedRegex findAllIn commitInfo
+      if (matchingStrings nonEmpty)
+        getFirstNum(matchingStrings next)
+      else
+        0
+    }
+
+
+    val filesChanged:Int = getNumberWithPatternFromShortStat(shortStatInfo, "files? changed")
+    val linesAdded:Int = getNumberWithPatternFromShortStat(shortStatInfo, "insertions")
+    val linesDeleted:Int = getNumberWithPatternFromShortStat(shortStatInfo, "deletions")
+  }
 
   def logFullCommit(gitHash: GitHash):String = {
     sealed abstract class DisplayVariant {
@@ -53,19 +67,25 @@ trait RepoFunctions extends Client{ self =>
     case object SHORTSTAT extends DisplayVariant { val parameter = Seq("--shortstat") }
     case object ONELINE extends DisplayVariant { val parameter = Seq("--oneline") }
 
-    repo.logCommand.execute(Seq(gitHash.hash) ++ SHORTSTAT.parameter)
+    repo.showCommand.execute(Seq(gitHash.hash) ++ SHORTSTAT.parameter)
   }
 
+  // TODO Approach this with "git log" on the head, rather than potentially thousands of external calls to "git show"
   def createDeltas(hashes: List[GitHash]): List[DataPlottable] = {
     val commitDeltas: List[CommitDelta] = hashes.zipWithIndex map {
-      case (hash,idx) => CommitDelta( idx, getLinesAdded(hash), -getLinesDeleted(hash))
+      case (hash,idx) =>
+        // I think some of my terrible performance is due to multiple external commands here.
+        val metaData = CommitMetaData(hash)
+        CommitDelta( idx, metaData.linesAdded, metaData.linesDeleted)
     }
     commitDeltas
   }
 
   def createFileNumberDeltas(hashes: List[GitHash]): List[DataPlottable] = {
     val commitDeltas: List[CommitFileNumberDelta] = hashes.zipWithIndex map {
-      case (hash,idx) => CommitFileNumberDelta( idx, getFilesChanged(hash)) 
+      case (hash,idx) =>
+        val metaData = CommitMetaData(hash)
+        CommitFileNumberDelta( idx, metaData.filesChanged)
     }
     commitDeltas
   }

@@ -18,10 +18,10 @@ object CommitParser {
 class CommitParser(val repo: Repo) extends Actor with ActorLogging with RepoFunctions{
   def receive = {
     case LineDeltas => {
+        println("about to calc lineDeltas and then return to: " + sender.toString())
         sender ! DataFile(repo, createDeltas(repo.hashes))
     }
     case FilesChanged => {
-        println("lsFiles: " + lsFilesCommand.execute())
         sender ! DataFile(repo, createFileNumberDeltas(repo.hashes))
     }
     case FollowFiles => {
@@ -32,7 +32,7 @@ class CommitParser(val repo: Repo) extends Actor with ActorLogging with RepoFunc
 
 case class CommitDelta(idx: Long, linesAdded: Long, linesDeleted: Long) extends DataPlottable
 {
-  def dataString = s"$idx $linesAdded $linesDeleted"
+  def dataString = s"$idx $linesAdded -$linesDeleted"
 }
 
 case class CommitFileNumberDelta(idx: Long, filesChanged: Long) extends DataPlottable

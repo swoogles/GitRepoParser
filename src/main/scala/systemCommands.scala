@@ -21,6 +21,8 @@ trait ExecutableStandAlone extends Executable{
   }
 
   override def execute(arguments: Seq[String]): String = {
+    // Simplistic logging
+    // println("executing external command: " + (program++persistentArguments++arguments).mkString(" "))
     super.execute(program++persistentArguments++arguments)
   }
 

@@ -19,6 +19,12 @@ object GitManager {
     perform(chosenAction, List(repo))
   }
 
+  def analyzeRepo(action: String, targetRepos: Seq[Path] ) = {
+    val chosenAction: Try[RepoAction] = RepoAction.getAction(action)
+    val repos = targetRepos map {  Repo(_) }
+    perform(chosenAction, repos)
+  }
+
   def main(args: Array[String]) = 
   {
     val cmdLineArgs: Array[String] = args(0).split("\\s+")
@@ -45,7 +51,7 @@ object GitManager {
     perform(chosenAction, repos)
   }
 
-  private def perform(chosenAction: Try[RepoAction], repos: List[Repo] ) = {
+  private def perform(chosenAction: Try[RepoAction], repos: Seq[Repo] ) = {
     chosenAction match {
       case Success(repoAction) => {
         val system = ActorSystem("helloakka")

@@ -40,14 +40,19 @@ class GitDataFileCreator(
   val outputDirs: OutputDirectories
 ) extends Actor with ActorLogging
 {
+  val plotScript = outputDirs.plotFiles / (repo.fileName + ".gnuplot")
+  val dataFile = outputDirs.dataFiles / (repo.fileName +".dat")
+
   def receive = {
     case dataFile: DataFile => {
+      println("received data file. Time to write for repo: " + repo)
       writeDataFile(dataFile.dataStrings)
-      sender ! FileWritten
+      sender ! FileWritten(plotScript)
     }
     case PlotScript(data) => {
+      println("received plotscript file. Time to write for repo: " + repo)
       writePlotScript(data)
-      sender ! FileWritten
+      sender ! FileWritten(dataFile)
     }
   }
 
@@ -55,14 +60,12 @@ class GitDataFileCreator(
   val utility: Utility = new Utility
 
   def writePlotScript(data:List[String]) = {
-    val plotScript = outputDirs.plotFiles / (repo.fileName + ".gnuplot")
     dataWriter.write(data, plotScript, utility)
   }
 
   def writeDataFile(data:List[String]) = {
-    val dataFile = outputDirs.dataFiles / repo.fileName +".dat"
     dataWriter.write(data, dataFile, utility)
   }
 }
 
-case object FileWritten
+case class FileWritten(file: Path)
